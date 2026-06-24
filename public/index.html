@@ -181,6 +181,10 @@
   .lg-field label { display: block; font-size: 14px; font-weight: 700; color: #1f2d52; margin-bottom: 8px; }
   .lg-field input { width: 100%; padding: 13px 15px; border: 1.5px solid #e3e8f3; border-radius: 11px; font-size: 15px; color: #1f2d52; outline: none; font-family: Inter, sans-serif; }
   .lg-field input:focus { border-color: #1f2d52; }
+  .lg-pwwrap { position: relative; }
+  .lg-pwwrap input { padding-right: 44px; }
+  .lg-pweye { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9aa3ba; padding: 6px; display: flex; align-items: center; }
+  .lg-pweye:hover { color: #1f2d52; }
   .lg-btn { width: 100%; background: #2c3e6e; color: #fff; border: none; border-radius: 11px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; }
   .lg-btn:hover { background: #243358; }
   .lg-err { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; border-radius: 10px; padding: 10px 13px; font-size: 13px; font-weight: 500; margin-bottom: 14px; display: none; }
@@ -258,7 +262,7 @@
     <div class="lg-card">
       <div class="lg-err" id="lg-err" data-ru="Неверный логин или пароль" data-kz="Логин немесе құпиясөз қате">Неверный логин или пароль</div>
       <div class="lg-field"><label data-ru="Логин или email" data-kz="Логин немесе email">Логин или email</label><input id="lg-login" type="text" placeholder="Имя пользователя" autocomplete="username" onkeydown="if(event.key==='Enter')doAuth()"></div>
-      <div class="lg-field"><label data-ru="Пароль" data-kz="Құпиясөз">Пароль</label><input id="lg-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"></div>
+      <div class="lg-field"><label data-ru="Пароль" data-kz="Құпиясөз">Пароль</label><div class="lg-pwwrap"><input id="lg-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"><button type="button" class="lg-pweye" id="lg-eye" onclick="togglePw()" aria-label="Показать пароль"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
       <button class="lg-btn" onclick="doAuth()" data-ru="Войти" data-kz="Кіру">Войти</button>
     </div>
     <div class="lg-foot" data-ru="Доступ выдаёт администратор курса" data-kz="Кіруді курс әкімшісі береді">Доступ выдаёт администратор курса</div>
@@ -550,6 +554,15 @@
       return SESSION_ROLE === 'admin'
         ? (kz ? 'Әкімші-бақылаушы' : 'Админ-обозреватель')
         : (kz ? 'Суперәкімші · Курс жетекшісі' : 'Суперадмин · Ведущий курса');
+    }
+    function togglePw(){
+      const i = document.getElementById('lg-pass');
+      const eye = document.getElementById('lg-eye');
+      const open = i.type === 'password';
+      i.type = open ? 'text' : 'password';
+      eye.innerHTML = open
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.9 4.24A9.1 9.1 0 0 1 12 4c6.5 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68M6.6 6.6A13.5 13.5 0 0 0 2 12s3.5 7 10 7a9.1 9.1 0 0 0 4.4-1.1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><line x1="2" y1="2" x2="22" y2="22"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
     }
     async function doAuth(){
       const kz = LANG === 'kz';
