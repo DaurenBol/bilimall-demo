@@ -67,6 +67,30 @@ app.post('/api/profile', auth, (req, res) => {
   res.json({ ok: true });
 });
 
+const ACCOUNTS = path.join(DATA, 'accounts.json');
+const DEF_ACCOUNTS = [
+  { id:1, name:'Бекмурат Оналбай', email:'bekmurat@bilimall.kz', role:'super', lead:true },
+  { id:2, name:'Айгерим Сатпаева', email:'aigerim@bilimall.kz', role:'admin' },
+  { id:3, name:'Данияр Оспанов', email:'daniyar@bilimall.kz', role:'lead' }
+];
+const readAccounts = () => { try { return JSON.parse(fs.readFileSync(ACCOUNTS, 'utf8')); } catch (e) { return JSON.parse(JSON.stringify(DEF_ACCOUNTS)); } };
+const writeAccounts = a => fs.writeFileSync(ACCOUNTS, JSON.stringify(a));
+app.get('/api/accounts', auth, (req, res) => res.json(readAccounts()));
+app.post('/api/accounts', auth, (req, res) => {
+  if (req.role !== 'super') return res.status(403).json({ error: 'forbidden' });
+  const list = (req.body && req.body.accounts) || [];
+  if (!Array.isArray(list)) return res.status(400).json({ error: 'bad' });
+  const clean = list.filter(a => a && a.name && a.email).slice(0, 500).map(a => ({
+    id: Number(a.id) || Date.now() + Math.floor(Math.random() * 1000),
+    name: String(a.name).slice(0, 120),
+    email: String(a.email).slice(0, 120),
+    role: ['super','admin','lead'].includes(a.role) ? a.role : 'lead',
+    lead: !!a.lead
+  }));
+  writeAccounts(clean);
+  res.json({ ok: true });
+});
+
 app.use('/secure', auth, express.static(path.join(__dirname, 'secure')));
 app.use('/lessons', auth, express.static(path.join(__dirname, 'secure', 'lessons')));
 app.use(express.static(path.join(__dirname, 'public')));

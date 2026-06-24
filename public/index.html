@@ -913,12 +913,17 @@
       { id:2, name:'Айгерим Сатпаева', email:'aigerim@bilimall.kz', role:'admin' },
       { id:3, name:'Данияр Оспанов', email:'daniyar@bilimall.kz', role:'lead' }
     ];
-    function loadAccounts(){ try { const r = localStorage.getItem('ba_accounts'); return r ? JSON.parse(r) : JSON.parse(JSON.stringify(ACCOUNTS_DEFAULT)); } catch(e){ return JSON.parse(JSON.stringify(ACCOUNTS_DEFAULT)); } }
-    function saveAccounts(a){ try { localStorage.setItem('ba_accounts', JSON.stringify(a)); } catch(e){} }
-    function renderAccounts(){
+    let ACCOUNTS_CACHE = [];
+    async function loadAccountsFromServer(){
+      try { const r = await fetch('/api/accounts', { cache:'no-store' }); ACCOUNTS_CACHE = r.ok ? await r.json() : JSON.parse(JSON.stringify(ACCOUNTS_DEFAULT)); }
+      catch(e){ ACCOUNTS_CACHE = JSON.parse(JSON.stringify(ACCOUNTS_DEFAULT)); }
+    }
+    function saveAccountsToServer(){
+      return fetch('/api/accounts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ accounts: ACCOUNTS_CACHE }) }).catch(()=>{});
+    }
+    function paintAccounts(){
       const kz = LANG === 'kz';
-      const accs = loadAccounts();
-      document.getElementById('accounts-list').innerHTML = accs.map(a => {
+      document.getElementById('accounts-list').innerHTML = ACCOUNTS_CACHE.map(a => {
         const r = ROLES[a.role]; const isSuper = a.role === 'super';
         const roleCtl = isSuper
           ? '<span class="rolebadge" style="background:'+r.bg+';color:'+r.fg+'">'+(kz?r.kz:r.ru)+'</span>'
@@ -927,25 +932,33 @@
         return '<div class="acc"><span class="accav">'+initials(a.name)+'</span><div class="ai"><div class="an">'+a.name+'</div><div class="ae">'+a.email+'</div></div>'+roleCtl+del+'</div>';
       }).join('');
     }
-    function createAccount(){
+    async function renderAccounts(){ await loadAccountsFromServer(); paintAccounts(); }
+    async function createAccount(){
       const kz = LANG === 'kz';
       const name = document.getElementById('acc-name').value.trim();
       const email = document.getElementById('acc-email').value.trim();
       const role = document.getElementById('acc-role').value;
       if (!name){ setMsg('msg-acc', kz?'Қызметкердің атын енгізіңіз':'Введите имя сотрудника', false); return; }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setMsg('msg-acc', kz?'Email қате':'Неверный формат email', false); return; }
-      const accs = loadAccounts();
-      if (accs.some(a => a.email.toLowerCase() === email.toLowerCase())){ setMsg('msg-acc', kz?'Мұндай email бар':'Аккаунт с таким email уже есть', false); return; }
-      accs.push({ id: Date.now(), name, email, role });
-      saveAccounts(accs);
+      if (ACCOUNTS_CACHE.some(a => a.email.toLowerCase() === email.toLowerCase())){ setMsg('msg-acc', kz?'Мұндай email бар':'Аккаунт с таким email уже есть', false); return; }
+      ACCOUNTS_CACHE.push({ id: Date.now(), name, email, role });
+      await saveAccountsToServer();
       document.getElementById('acc-name').value = ''; document.getElementById('acc-email').value = '';
-      renderAccounts();
+      paintAccounts();
       setMsg('msg-acc', kz?'Аккаунт құрылды ✓':'Аккаунт создан ✓', true);
     }
-    function changeRole(id, role){ const accs = loadAccounts(); const a = accs.find(x => x.id === id); if (a){ a.role = role; saveAccounts(accs); renderAccounts(); } }
-    function renderLeads(){
+    async function changeRole(id, role){ const a = ACCOUNTS_CACHE.find(x => x.id === id); if (a){ a.role = role; await saveAccountsToServer(); paintAccounts(); } }
+    async function removeAccount(id){
       const kz = LANG === 'kz';
-      const leads = loadAccounts().filter(a => a.role === 'lead' || a.lead);
+      if (!confirm(kz?'Қатысушыны жою керек пе? Бұл барлық құрылғыда жойылады':'Удалить участника? Удалится на всех устройствах')) return;
+      ACCOUNTS_CACHE = ACCOUNTS_CACHE.filter(x => x.id !== id);
+      await saveAccountsToServer();
+      paintAccounts();
+    }
+    async function renderLeads(){
+      const kz = LANG === 'kz';
+      await loadAccountsFromServer();
+      const leads = ACCOUNTS_CACHE.filter(a => a.role === 'lead' || a.lead);
       const courseName = LANG === 'kz' ? 'ЖИ оқытушы жұмысында' : 'ИИ в работе преподавателя';
       const leadStyle = ROLES.lead;
       const leadLabel = kz ? ROLES.lead.kz : ROLES.lead.ru;
@@ -957,12 +970,6 @@
           + '<div style="margin-top:9px;display:flex;gap:7px;flex-wrap:wrap;align-items:center"><span class="rolebadge" style="background:'+leadStyle.bg+';color:'+leadStyle.fg+'">'+leadLabel+'</span><span style="font-size:11.5px;color:#8a93ad">· '+(kz?'Жүргізеді: ':'Ведёт: ')+courseName+'</span></div></div>'
           + '</div>';
       }).join('');
-    }
-    function removeAccount(id){
-      const kz = LANG === 'kz';
-      if (!confirm(kz?'Қызметкердің аккаунтын жою керек пе?':'Удалить аккаунт сотрудника?')) return;
-      saveAccounts(loadAccounts().filter(x => x.id !== id));
-      renderAccounts();
     }
 
     let charts = {};
