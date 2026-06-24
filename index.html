@@ -196,7 +196,9 @@
   body.role-admin .invite,
   body.role-admin .vidrow,
   body.role-admin #set-team-card,
-  body.role-admin #set-logs-card { display: none !important; }
+  body.role-admin #set-logs-card,
+  body.role-admin #set-notif-card,
+  body.role-admin #set-security-card { display: none !important; }
   .addbtns { display: flex; gap: 9px; margin-top: 14px; flex-wrap: wrap; }
   .addbtns button { background: #fff; border: 1.5px solid #e3e8f3; color: #64708c; font-size: 12.5px; font-weight: 600; padding: 8px 13px; border-radius: 9px; cursor: pointer; }
   .addbtns button:hover { border-color: #e8a317; color: #1f2d52; }
@@ -443,7 +445,7 @@
           <div class="smsg" id="msg-pw"></div>
         </div>
 
-        <div class="setcard">
+        <div class="setcard" id="set-notif-card">
           <h3 data-ru="Уведомления" data-kz="Хабарламалар">Уведомления</h3>
           <div class="shint" data-ru="Что присылать на вашу почту" data-kz="Поштаңызға не жіберілсін">Что присылать на вашу почту</div>
           <div class="setrow"><div class="sl"><div class="t" data-ru="Email-уведомления" data-kz="Email-хабарламалар">Email-уведомления</div><div class="d" data-ru="Важные события по курсу" data-kz="Курс бойынша маңызды оқиғалар">Важные события по курсу</div></div><button class="toggle" data-nk="email" onclick="toggleNotif('email')"><span></span></button></div>
@@ -451,7 +453,7 @@
           <div class="setrow"><div class="sl"><div class="t" data-ru="Новые ученики" data-kz="Жаңа оқушылар">Новые ученики</div><div class="d" data-ru="Уведомлять о регистрациях" data-kz="Тіркелулер туралы хабарлау">Уведомлять о регистрациях</div></div><button class="toggle" data-nk="newStudents" onclick="toggleNotif('newStudents')"><span></span></button></div>
         </div>
 
-        <div class="setcard">
+        <div class="setcard" id="set-security-card">
           <h3 data-ru="Безопасность" data-kz="Қауіпсіздік">Безопасность</h3>
           <div class="shint" data-ru="Защита аккаунта и язык интерфейса" data-kz="Аккаунтты қорғау және интерфейс тілі">Защита аккаунта и язык интерфейса</div>
           <div class="setrow"><div class="sl"><div class="t" data-ru="Двухфакторная аутентификация" data-kz="Екі факторлы аутентификация">Двухфакторная аутентификация</div><div class="d" data-ru="Код подтверждения при входе" data-kz="Кіру кезінде растау коды">Код подтверждения при входе</div></div><button class="toggle" id="tg-twofa" onclick="toggleTwofa()"><span></span></button></div>
