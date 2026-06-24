@@ -254,12 +254,11 @@
     <div class="lg-sub" data-ru="Вход в личный кабинет" data-kz="Жеке кабинетке кіру">Вход в личный кабинет</div>
     <div class="lg-card">
       <div class="lg-err" id="lg-err" data-ru="Неверный логин или пароль" data-kz="Логин немесе құпиясөз қате">Неверный логин или пароль</div>
-      <div class="lg-field"><label data-ru="Логин или email" data-kz="Логин немесе email">Логин или email</label><input id="lg-login" type="text" placeholder="super" autocomplete="username" onkeydown="if(event.key==='Enter')doAuth()"></div>
+      <div class="lg-field"><label data-ru="Логин или email" data-kz="Логин немесе email">Логин или email</label><input id="lg-login" type="text" placeholder="Имя пользователя" autocomplete="username" onkeydown="if(event.key==='Enter')doAuth()"></div>
       <div class="lg-field"><label data-ru="Пароль" data-kz="Құпиясөз">Пароль</label><input id="lg-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"></div>
       <button class="lg-btn" onclick="doAuth()" data-ru="Войти" data-kz="Кіру">Войти</button>
     </div>
     <div class="lg-foot" data-ru="Доступ выдаёт администратор курса" data-kz="Кіруді курс әкімшісі береді">Доступ выдаёт администратор курса</div>
-    <div class="lg-demo" data-ru="Демо: super / 1234 — суперадмин · admin / 1234 — обозреватель" data-kz="Демо: super / 1234 — суперәкімші · admin / 1234 — бақылаушы">Демо: super / 1234 — суперадмин · admin / 1234 — обозреватель</div>
   </div>
 
   <header>
@@ -550,7 +549,7 @@
   <script src="questions.js"></script>
   <script src="students.js"></script>
   <script>
-    const AUTH = { 'super':{ pass:'1234', role:'super' }, 'admin':{ pass:'1234', role:'admin' } };
+    const AUTH = { 'superadmin':{ pass:'Dauren7328620', role:'super' }, 'admin':{ pass:'Admin1234!', role:'admin' } };
     let SESSION_ROLE = null;
     function doAuth(){
       const l = document.getElementById('lg-login').value.trim().toLowerCase();
