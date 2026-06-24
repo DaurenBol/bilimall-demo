@@ -549,9 +549,15 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="questions.js"></script>
-  <script src="students.js"></script>
   <script>
+    async function loadSecureData(){
+      const [q, s] = await Promise.all([
+        fetch('/secure/questions.js', { cache:'no-store' }).then(r => r.ok ? r.text() : ''),
+        fetch('/secure/students.js', { cache:'no-store' }).then(r => r.ok ? r.text() : '')
+      ]);
+      if (q) (new Function(q))();
+      if (s) (new Function(s))();
+    }
     const AUTH = { 'superadmin':{ hash:'2333a9b227fe5674c24a0673b051e28e3328dac15284ba8d7e5c2a17ff7f9b12', role:'super' }, 'admin':{ hash:'625e6f2f13d1a10a2d5c4173177e99cbdde8d37961fd26a8c810e75f78ed1185', role:'admin' } };
     const AUTH_SALT = 'bilimall::v1::';
     async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join(''); }
@@ -562,36 +568,21 @@
         ? (kz ? 'Әкімші-бақылаушы' : 'Админ-обозреватель')
         : (kz ? 'Суперәкімші · Курс жетекшісі' : 'Суперадмин · Ведущий курса');
     }
-    const MAX_FAILS = 7, LOCK_MS = 15 * 60 * 1000;
     async function doAuth(){
       const kz = LANG === 'kz';
       const errEl = document.getElementById('lg-err');
       const show = t => { errEl.textContent = t; errEl.style.display = 'block'; };
-      const lockUntil = parseInt(localStorage.getItem('ba_login_lock') || '0');
-      const rem = lockUntil - Date.now();
-      if (rem > 0){ const m = Math.ceil(rem / 60000); show(kz ? ('Тым көп әрекет. '+m+' мин күтіңіз') : ('Слишком много попыток. Подождите '+m+' мин')); return; }
-      const l = document.getElementById('lg-login').value.trim().toLowerCase();
-      const p = document.getElementById('lg-pass').value;
-      const a = AUTH[l];
-      const ok = a && (await sha256hex(AUTH_SALT + p)) === a.hash;
-      if (!ok){
-        let f = parseInt(localStorage.getItem('ba_login_fails') || '0') + 1;
-        if (f >= MAX_FAILS){
-          localStorage.setItem('ba_login_lock', String(Date.now() + LOCK_MS));
-          localStorage.setItem('ba_login_fails', '0');
-          show(kz ? 'Тым көп әрекет. 15 минутқа бұғатталды' : 'Слишком много попыток. Блокировка на 15 минут');
-        } else {
-          localStorage.setItem('ba_login_fails', String(f));
-          show(kz ? ('Қате. Қалған әрекет: '+(MAX_FAILS - f)) : ('Неверно. Осталось попыток: '+(MAX_FAILS - f)));
-        }
-        return;
-      }
-      localStorage.removeItem('ba_login_fails');
-      localStorage.removeItem('ba_login_lock');
+      const user = document.getElementById('lg-login').value.trim();
+      const pass = document.getElementById('lg-pass').value;
+      let r;
+      try { r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ user, pass }) }); }
+      catch(e){ show(kz ? 'Сервер қолжетімсіз' : 'Сервер недоступен'); return; }
+      if (r.status === 429){ show(kz ? 'Тым көп әрекет. 15 минуттан кейін көріңіз' : 'Слишком много попыток. Подождите 15 минут'); return; }
+      if (!r.ok){ show(kz ? 'Логин немесе құпиясөз қате' : 'Неверный логин или пароль'); return; }
+      const data = await r.json();
       errEl.style.display = 'none';
-      if (a.role === 'super'){ SUPER_PASS_MEM = p; try { sessionStorage.setItem('ba_sp', p); } catch(e){} }
-      localStorage.setItem('ba_session_role', a.role);
-      enterApp(a.role);
+      await loadSecureData();
+      enterApp(data.role);
     }
     function enterApp(role){
       SESSION_ROLE = role;
@@ -605,9 +596,7 @@
       startDaysSync();
     }
     function logout(){
-      SUPER_PASS_MEM = '';
-      try { sessionStorage.removeItem('ba_sp'); } catch(e){}
-      localStorage.removeItem('ba_session_role');
+      try { fetch('/api/logout', { method:'POST' }); } catch(e){}
       SESSION_ROLE = null;
       document.body.classList.remove('role-admin');
       document.getElementById('lg-pass').value = '';
@@ -819,7 +808,7 @@
       refreshAll();
       try {
         await fetch('/api/days', { method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ openDays:[...OPEN_DAYS], pass: SUPER_PASS_MEM }) });
+          body: JSON.stringify({ openDays:[...OPEN_DAYS] }) });
       } catch(e){}
     }
     let daysPollTimer = null;
@@ -1214,7 +1203,9 @@
     applyI18n();
     renderModules();
     renderDashStats();
-    (function(){ const s = localStorage.getItem('ba_session_role'); if (s === 'super' || s === 'admin'){ if (s === 'super'){ try { SUPER_PASS_MEM = sessionStorage.getItem('ba_sp') || ''; } catch(e){} } enterApp(s); } })();
+    (async function(){
+      try { const r = await fetch('/api/me', { cache:'no-store' }); if (r.ok){ const d = await r.json(); await loadSecureData(); enterApp(d.role); } } catch(e){}
+    })();
   </script>
 </body>
 </html>
