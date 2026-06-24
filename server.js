@@ -50,6 +50,23 @@ app.post('/api/days', auth, (req, res) => {
   res.json({ ok: true, openDays: clean });
 });
 
+const PROFILES = path.join(DATA, 'profiles.json');
+const DEF_PROFILES = {
+  super: { firstName:'Бекмурат', lastName:'Оналбай', email:'bekmurat@bilimall.kz', phone:'+7 778 965 87 40', org:'ЮКПУ им. О. Жанибекова', notif:{ email:true, weekly:true, newStudents:false }, twofa:false },
+  admin: { firstName:'', lastName:'', email:'', phone:'', org:'ЮКПУ им. О. Жанибекова', notif:{ email:true, weekly:false, newStudents:false }, twofa:false }
+};
+const readProfiles = () => { try { return JSON.parse(fs.readFileSync(PROFILES, 'utf8')); } catch (e) { return JSON.parse(JSON.stringify(DEF_PROFILES)); } };
+const writeProfiles = p => fs.writeFileSync(PROFILES, JSON.stringify(p));
+app.get('/api/profile', auth, (req, res) => { const p = readProfiles(); res.json(p[req.role] || DEF_PROFILES[req.role] || {}); });
+app.post('/api/profile', auth, (req, res) => {
+  const p = readProfiles();
+  if (!p[req.role]) p[req.role] = JSON.parse(JSON.stringify(DEF_PROFILES[req.role] || {}));
+  const b = req.body || {};
+  ['firstName','lastName','email','phone','org','notif','twofa'].forEach(k => { if (k in b) p[req.role][k] = b[k]; });
+  writeProfiles(p);
+  res.json({ ok: true });
+});
+
 app.use('/secure', auth, express.static(path.join(__dirname, 'secure')));
 app.use('/lessons', auth, express.static(path.join(__dirname, 'secure', 'lessons')));
 app.use(express.static(path.join(__dirname, 'public')));

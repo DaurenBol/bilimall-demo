@@ -427,17 +427,6 @@
           <div class="smsg" id="msg-profile"></div>
         </div>
 
-        <div class="setcard">
-          <h3 data-ru="Смена пароля" data-kz="Құпиясөзді ауыстыру">Смена пароля</h3>
-          <div class="shint" data-ru="Минимум 6 символов" data-kz="Кемінде 6 таңба">Минимум 6 символов</div>
-          <div class="field"><label data-ru="Текущий пароль" data-kz="Ағымдағы құпиясөз">Текущий пароль</label><input id="set-pw-cur" type="password"></div>
-          <div class="frow">
-            <div class="field"><label data-ru="Новый пароль" data-kz="Жаңа құпиясөз">Новый пароль</label><input id="set-pw-new" type="password"></div>
-            <div class="field"><label data-ru="Повторите пароль" data-kz="Құпиясөзді қайталаңыз">Повторите пароль</label><input id="set-pw-rep" type="password"></div>
-          </div>
-          <button class="sbtn" onclick="changePassword()" data-ru="Изменить пароль" data-kz="Құпиясөзді ауыстыру">Изменить пароль</button>
-          <div class="smsg" id="msg-pw"></div>
-        </div>
 
         <div class="setcard" id="set-notif-card">
           <h3 data-ru="Уведомления" data-kz="Хабарламалар">Уведомления</h3>
@@ -843,18 +832,17 @@
     function loadSettings(){ try { const r = localStorage.getItem('ba_settings'); const base = JSON.parse(JSON.stringify(SET_DEFAULTS)); if (r){ const p = JSON.parse(r); Object.assign(base, p); base.notif = Object.assign({}, SET_DEFAULTS.notif, p.notif||{}); } return base; } catch(e){ return JSON.parse(JSON.stringify(SET_DEFAULTS)); } }
     function saveSettings(){ try { localStorage.setItem('ba_settings', JSON.stringify(SETTINGS)); } catch(e){} }
     function setMsg(id, text, ok){ const el = document.getElementById(id); el.textContent = text; el.className = 'smsg ' + (ok ? 'ok' : 'err'); }
-    function renderSettings(){
-      SETTINGS = loadSettings();
+    async function renderSettings(){
       const kz = LANG === 'kz';
-      document.getElementById('set-first').value = SETTINGS.firstName;
-      document.getElementById('set-last').value = SETTINGS.lastName;
-      document.getElementById('set-email').value = SETTINGS.email;
-      document.getElementById('set-phone').value = SETTINGS.phone;
-      document.getElementById('set-org').value = SETTINGS.org;
+      try { const r = await fetch('/api/profile', { cache:'no-store' }); SETTINGS = r.ok ? await r.json() : {}; } catch(e){ SETTINGS = {}; }
+      SETTINGS.notif = SETTINGS.notif || {};
+      document.getElementById('set-first').value = SETTINGS.firstName || '';
+      document.getElementById('set-last').value = SETTINGS.lastName || '';
+      document.getElementById('set-email').value = SETTINGS.email || '';
+      document.getElementById('set-phone').value = SETTINGS.phone || '';
+      document.getElementById('set-org').value = SETTINGS.org || '';
       document.getElementById('set-role').value = roleLabelText();
       document.getElementById('msg-profile').textContent = '';
-      document.getElementById('msg-pw').textContent = '';
-      ['set-pw-cur','set-pw-new','set-pw-rep'].forEach(id => document.getElementById(id).value = '');
       document.querySelectorAll('.toggle[data-nk]').forEach(t => t.classList.toggle('on', !!SETTINGS.notif[t.dataset.nk]));
       document.getElementById('tg-twofa').classList.toggle('on', !!SETTINGS.twofa);
       document.getElementById('set-lang-ru').classList.toggle('on', LANG === 'ru');
@@ -862,18 +850,19 @@
       document.getElementById('msg-acc').textContent = '';
       renderAccounts();
     }
-    function saveProfile(){
+    async function saveProfile(){
       const kz = LANG === 'kz';
       const first = document.getElementById('set-first').value.trim();
       const last = document.getElementById('set-last').value.trim();
       const email = document.getElementById('set-email').value.trim();
       if (!first || !last){ setMsg('msg-profile', kz?'Аты мен тегін толтырыңыз':'Заполните имя и фамилию', false); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setMsg('msg-profile', kz?'Email қате':'Неверный формат email', false); return; }
-      SETTINGS.firstName = first; SETTINGS.lastName = last; SETTINGS.email = email;
-      SETTINGS.phone = document.getElementById('set-phone').value.trim();
-      SETTINGS.org = document.getElementById('set-org').value.trim();
-      saveSettings();
-      setMsg('msg-profile', kz?'Сақталды ✓':'Сохранено ✓', true);
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setMsg('msg-profile', kz?'Email қате':'Неверный формат email', false); return; }
+      const body = { firstName:first, lastName:last, email, phone:document.getElementById('set-phone').value.trim(), org:document.getElementById('set-org').value.trim() };
+      Object.assign(SETTINGS, body);
+      try {
+        const r = await fetch('/api/profile', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        setMsg('msg-profile', r.ok ? (kz?'Сақталды ✓':'Сохранено ✓') : (kz?'Сақтау қатесі':'Ошибка сохранения'), r.ok);
+      } catch(e){ setMsg('msg-profile', kz?'Сервер қолжетімсіз':'Сервер недоступен', false); }
     }
     function changePassword(){
       const kz = LANG === 'kz';
@@ -887,8 +876,8 @@
       ['set-pw-cur','set-pw-new','set-pw-rep'].forEach(id => document.getElementById(id).value = '');
       setMsg('msg-pw', kz?'Құпиясөз ауыстырылды ✓':'Пароль изменён ✓', true);
     }
-    function toggleNotif(k){ SETTINGS.notif[k] = !SETTINGS.notif[k]; saveSettings(); document.querySelector('.toggle[data-nk="'+k+'"]').classList.toggle('on', SETTINGS.notif[k]); }
-    function toggleTwofa(){ SETTINGS.twofa = !SETTINGS.twofa; saveSettings(); document.getElementById('tg-twofa').classList.toggle('on', SETTINGS.twofa); }
+    function toggleNotif(k){ SETTINGS.notif[k] = !SETTINGS.notif[k]; document.querySelector('.toggle[data-nk="'+k+'"]').classList.toggle('on', SETTINGS.notif[k]); fetch('/api/profile', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notif: SETTINGS.notif }) }).catch(()=>{}); }
+    function toggleTwofa(){ SETTINGS.twofa = !SETTINGS.twofa; document.getElementById('tg-twofa').classList.toggle('on', SETTINGS.twofa); fetch('/api/profile', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ twofa: SETTINGS.twofa }) }).catch(()=>{}); }
 
     const ROLES = {
       super: { ru:'Суперадмин', kz:'Суперәкімші', bg:'#ede9fe', fg:'#6d28d9' },
