@@ -53,7 +53,7 @@ app.post('/api/days', auth, (req, res) => {
 const PROFILES = path.join(DATA, 'profiles.json');
 const DEF_PROFILES = {
   super: { firstName:'Бекмурат', lastName:'Оналбай', email:'bekmurat@bilimall.kz', phone:'+7 778 965 87 40', org:'ЮКПУ им. О. Жанибекова', notif:{ email:true, weekly:true, newStudents:false }, twofa:false },
-  admin: { firstName:'', lastName:'', email:'', phone:'', org:'ЮКПУ им. О. Жанибекова', notif:{ email:true, weekly:false, newStudents:false }, twofa:false }
+  admin: { firstName:'Админ', lastName:'Обозреватель', email:'admin@bilimall.kz', phone:'', org:'', notif:{ email:true, weekly:false, newStudents:false }, twofa:false }
 };
 const readProfiles = () => { try { return JSON.parse(fs.readFileSync(PROFILES, 'utf8')); } catch (e) { return JSON.parse(JSON.stringify(DEF_PROFILES)); } };
 const writeProfiles = p => fs.writeFileSync(PROFILES, JSON.stringify(p));
