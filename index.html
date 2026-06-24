@@ -562,13 +562,33 @@
         ? (kz ? 'Әкімші-бақылаушы' : 'Админ-обозреватель')
         : (kz ? 'Суперәкімші · Курс жетекшісі' : 'Суперадмин · Ведущий курса');
     }
+    const MAX_FAILS = 7, LOCK_MS = 15 * 60 * 1000;
     async function doAuth(){
+      const kz = LANG === 'kz';
+      const errEl = document.getElementById('lg-err');
+      const show = t => { errEl.textContent = t; errEl.style.display = 'block'; };
+      const lockUntil = parseInt(localStorage.getItem('ba_login_lock') || '0');
+      const rem = lockUntil - Date.now();
+      if (rem > 0){ const m = Math.ceil(rem / 60000); show(kz ? ('Тым көп әрекет. '+m+' мин күтіңіз') : ('Слишком много попыток. Подождите '+m+' мин')); return; }
       const l = document.getElementById('lg-login').value.trim().toLowerCase();
       const p = document.getElementById('lg-pass').value;
       const a = AUTH[l];
       const ok = a && (await sha256hex(AUTH_SALT + p)) === a.hash;
-      if (!ok){ document.getElementById('lg-err').style.display = 'block'; return; }
-      document.getElementById('lg-err').style.display = 'none';
+      if (!ok){
+        let f = parseInt(localStorage.getItem('ba_login_fails') || '0') + 1;
+        if (f >= MAX_FAILS){
+          localStorage.setItem('ba_login_lock', String(Date.now() + LOCK_MS));
+          localStorage.setItem('ba_login_fails', '0');
+          show(kz ? 'Тым көп әрекет. 15 минутқа бұғатталды' : 'Слишком много попыток. Блокировка на 15 минут');
+        } else {
+          localStorage.setItem('ba_login_fails', String(f));
+          show(kz ? ('Қате. Қалған әрекет: '+(MAX_FAILS - f)) : ('Неверно. Осталось попыток: '+(MAX_FAILS - f)));
+        }
+        return;
+      }
+      localStorage.removeItem('ba_login_fails');
+      localStorage.removeItem('ba_login_lock');
+      errEl.style.display = 'none';
       localStorage.setItem('ba_session_role', a.role);
       enterApp(a.role);
     }
