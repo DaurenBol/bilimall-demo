@@ -429,7 +429,7 @@
 
         <div class="setcard">
           <h3 data-ru="Смена пароля" data-kz="Құпиясөзді ауыстыру">Смена пароля</h3>
-          <div class="shint" data-ru="Минимум 6 символов. Демо-пароль: 1234" data-kz="Кемінде 6 таңба. Демо-құпиясөз: 1234">Минимум 6 символов. Демо-пароль: 1234</div>
+          <div class="shint" data-ru="Минимум 6 символов" data-kz="Кемінде 6 таңба">Минимум 6 символов</div>
           <div class="field"><label data-ru="Текущий пароль" data-kz="Ағымдағы құпиясөз">Текущий пароль</label><input id="set-pw-cur" type="password"></div>
           <div class="frow">
             <div class="field"><label data-ru="Новый пароль" data-kz="Жаңа құпиясөз">Новый пароль</label><input id="set-pw-new" type="password"></div>
@@ -889,7 +889,6 @@
     }
     function toggleNotif(k){ SETTINGS.notif[k] = !SETTINGS.notif[k]; saveSettings(); document.querySelector('.toggle[data-nk="'+k+'"]').classList.toggle('on', SETTINGS.notif[k]); }
     function toggleTwofa(){ SETTINGS.twofa = !SETTINGS.twofa; saveSettings(); document.getElementById('tg-twofa').classList.toggle('on', SETTINGS.twofa); }
-    function accountLogout(){ alert(LANG==='kz'?'Аккаунттан шығу (демо)':'Выход из аккаунта (демо)'); }
 
     const ROLES = {
       super: { ru:'Суперадмин', kz:'Суперәкімші', bg:'#ede9fe', fg:'#6d28d9' },
