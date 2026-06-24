@@ -168,6 +168,34 @@
   .accdel { background: none; border: none; cursor: pointer; color: #c4485a; padding: 6px; flex-shrink: 0; }
   .soon { display: flex; align-items: center; gap: 12px; background: #f6f8fc; border: 1px dashed #d6deec; border-radius: 12px; padding: 16px 18px; color: #64708c; font-size: 13.5px; }
   .soonbadge { font-size: 10px; font-weight: 700; background: #fef3c7; color: #a16207; padding: 3px 9px; border-radius: 7px; margin-left: auto; }
+
+  #login-screen { position: fixed; inset: 0; background: #1b2747; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+  .lg-lang { display: flex; gap: 4px; background: rgba(255,255,255,.08); border-radius: 9px; padding: 3px; margin-bottom: 26px; }
+  .lg-lang button { border: none; cursor: pointer; font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 7px; background: transparent; color: rgba(255,255,255,.55); }
+  .lg-lang button.on { background: #4a5578; color: #fff; }
+  .lg-logo { width: 64px; height: 64px; border-radius: 17px; background: #d8b24a; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #1b2747; box-shadow: 0 8px 22px rgba(216,178,74,.35); margin-bottom: 18px; }
+  .lg-title { font-size: 24px; font-weight: 800; color: #fff; text-align: center; letter-spacing: -.02em; }
+  .lg-sub { font-size: 14.5px; color: rgba(255,255,255,.5); margin-top: 8px; margin-bottom: 26px; }
+  .lg-card { background: #fff; border-radius: 18px; padding: 26px; width: 100%; max-width: 400px; box-shadow: 0 18px 50px rgba(0,0,0,.3); }
+  .lg-field { margin-bottom: 16px; }
+  .lg-field label { display: block; font-size: 14px; font-weight: 700; color: #1f2d52; margin-bottom: 8px; }
+  .lg-field input { width: 100%; padding: 13px 15px; border: 1.5px solid #e3e8f3; border-radius: 11px; font-size: 15px; color: #1f2d52; outline: none; font-family: Inter, sans-serif; }
+  .lg-field input:focus { border-color: #1f2d52; }
+  .lg-btn { width: 100%; background: #2c3e6e; color: #fff; border: none; border-radius: 11px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .lg-btn:hover { background: #243358; }
+  .lg-err { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; border-radius: 10px; padding: 10px 13px; font-size: 13px; font-weight: 500; margin-bottom: 14px; display: none; }
+  .lg-foot { font-size: 13px; color: rgba(255,255,255,.4); margin-top: 22px; text-align: center; }
+  .lg-demo { font-size: 11.5px; color: rgba(255,255,255,.32); margin-top: 8px; text-align: center; line-height: 1.6; }
+  .rolechip { font-size: 9px; font-weight: 700; letter-spacing: .08em; padding: 3px 8px; border-radius: 6px; margin-left: 8px; }
+
+  body.role-admin .toggle,
+  body.role-admin .addbtns,
+  body.role-admin .addmod,
+  body.role-admin .create,
+  body.role-admin .addcard,
+  body.role-admin .invite,
+  body.role-admin #set-team-card,
+  body.role-admin #set-logs-card { display: none !important; }
   .addbtns { display: flex; gap: 9px; margin-top: 14px; flex-wrap: wrap; }
   .addbtns button { background: #fff; border: 1.5px solid #e3e8f3; color: #64708c; font-size: 12.5px; font-weight: 600; padding: 8px 13px; border-radius: 9px; cursor: pointer; }
   .addbtns button:hover { border-color: #e8a317; color: #1f2d52; }
@@ -216,6 +244,24 @@
 </style>
 </head>
 <body>
+  <div id="login-screen">
+    <div class="lg-lang">
+      <button id="lg-ru" class="on" onclick="setLang('ru')">РУ</button>
+      <button id="lg-kz" onclick="setLang('kz')">ҚАЗ</button>
+    </div>
+    <div class="lg-logo">ИИ</div>
+    <div class="lg-title" data-ru="Курс «ИИ в работе преподавателя»" data-kz="«ЖИ оқытушы жұмысында» курсы">Курс «ИИ в работе преподавателя»</div>
+    <div class="lg-sub" data-ru="Вход в личный кабинет" data-kz="Жеке кабинетке кіру">Вход в личный кабинет</div>
+    <div class="lg-card">
+      <div class="lg-err" id="lg-err" data-ru="Неверный логин или пароль" data-kz="Логин немесе құпиясөз қате">Неверный логин или пароль</div>
+      <div class="lg-field"><label data-ru="Логин или email" data-kz="Логин немесе email">Логин или email</label><input id="lg-login" type="text" placeholder="super" autocomplete="username" onkeydown="if(event.key==='Enter')doAuth()"></div>
+      <div class="lg-field"><label data-ru="Пароль" data-kz="Құпиясөз">Пароль</label><input id="lg-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"></div>
+      <button class="lg-btn" onclick="doAuth()" data-ru="Войти" data-kz="Кіру">Войти</button>
+    </div>
+    <div class="lg-foot" data-ru="Доступ выдаёт администратор курса" data-kz="Кіруді курс әкімшісі береді">Доступ выдаёт администратор курса</div>
+    <div class="lg-demo" data-ru="Демо: super / 1234 — суперадмин · admin / 1234 — обозреватель" data-kz="Демо: super / 1234 — суперәкімші · admin / 1234 — бақылаушы">Демо: super / 1234 — суперадмин · admin / 1234 — обозреватель</div>
+  </div>
+
   <header>
     <div class="bar">
       <div class="logo">
@@ -232,7 +278,8 @@
         <button id="kz" onclick="setLang('kz')">ҚАЗ</button>
         <button id="ru" class="on" onclick="setLang('ru')">РУС</button>
       </div>
-      <button class="login" data-ru="Войти" data-kz="Кіру">Войти</button>
+      <span id="role-badge" class="rolechip"></span>
+      <button class="login" onclick="logout()" data-ru="Выйти" data-kz="Шығу">Выйти</button>
     </div>
   </header>
 
@@ -411,7 +458,7 @@
           <div class="setrow"><div class="sl"><div class="t" data-ru="Язык интерфейса" data-kz="Интерфейс тілі">Язык интерфейса</div><div class="d" data-ru="Применяется ко всему сайту" data-kz="Бүкіл сайтқа қолданылады">Применяется ко всему сайту</div></div><div class="langpick"><button id="set-lang-kz" onclick="setLang('kz')">ҚАЗ</button><button id="set-lang-ru" onclick="setLang('ru')">РУС</button></div></div>
         </div>
 
-        <div class="setcard">
+        <div class="setcard" id="set-team-card">
           <h3 data-ru="Команда и доступы" data-kz="Команда және рұқсаттар">Команда и доступы</h3>
           <div class="shint" data-ru="Создавайте аккаунты сотрудников и назначайте роли" data-kz="Қызметкерлерге аккаунт құрып, рөлдерді тағайындаңыз">Создавайте аккаунты сотрудников и назначайте роли</div>
           <div class="frow">
@@ -426,7 +473,7 @@
           <div id="accounts-list" style="margin-top:8px"></div>
         </div>
 
-        <div class="setcard">
+        <div class="setcard" id="set-logs-card">
           <h3 data-ru="Журнал входов" data-kz="Кіру журналы">Журнал входов</h3>
           <div class="shint" data-ru="Кто и когда заходил, какие действия выполнял — доступно только супер-админу" data-kz="Кім қашан кірді, қандай әрекет жасады — тек супер-әкімшіге қолжетімді">Кто и когда заходил, какие действия выполнял — доступно только супер-админу</div>
           <div class="soon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a93ad" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-ru="Журнал действий появится здесь" data-kz="Әрекеттер журналы осы жерде шығады">Журнал действий появится здесь</span><span class="soonbadge" data-ru="СКОРО" data-kz="ЖАҚЫНДА">СКОРО</span></div>
@@ -503,6 +550,37 @@
   <script src="questions.js"></script>
   <script src="students.js"></script>
   <script>
+    const AUTH = { 'super':{ pass:'1234', role:'super' }, 'admin':{ pass:'1234', role:'admin' } };
+    let SESSION_ROLE = null;
+    function doAuth(){
+      const l = document.getElementById('lg-login').value.trim().toLowerCase();
+      const p = document.getElementById('lg-pass').value;
+      const a = AUTH[l];
+      if (!a || a.pass !== p){ document.getElementById('lg-err').style.display = 'block'; return; }
+      document.getElementById('lg-err').style.display = 'none';
+      localStorage.setItem('ba_session_role', a.role);
+      enterApp(a.role);
+    }
+    function enterApp(role){
+      SESSION_ROLE = role;
+      document.body.classList.toggle('role-admin', role === 'admin');
+      document.getElementById('login-screen').style.display = 'none';
+      const kz = LANG === 'kz';
+      const rb = document.getElementById('role-badge');
+      if (role === 'super'){ rb.textContent = kz ? 'СУПЕРӘКІМШІ' : 'СУПЕРАДМИН'; rb.style.cssText = 'background:rgba(216,178,74,.25);color:#f5c252'; }
+      else { rb.textContent = kz ? 'БАҚЫЛАУШЫ' : 'ОБОЗРЕВАТЕЛЬ'; rb.style.cssText = 'background:rgba(255,255,255,.15);color:#cdd5e4'; }
+      if (window.STUDENTS){ renderModules(); renderDashStats(); }
+    }
+    function logout(){
+      localStorage.removeItem('ba_session_role');
+      SESSION_ROLE = null;
+      document.body.classList.remove('role-admin');
+      document.getElementById('lg-pass').value = '';
+      document.getElementById('lg-login').value = '';
+      document.getElementById('lg-err').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+    }
+
     let LANG = 'ru';
     function applyI18n(){
       document.querySelectorAll('[data-ru]').forEach(el => {
@@ -513,7 +591,10 @@
       LANG = l;
       document.getElementById('ru').classList.toggle('on', l === 'ru');
       document.getElementById('kz').classList.toggle('on', l === 'kz');
+      document.getElementById('lg-ru').classList.toggle('on', l === 'ru');
+      document.getElementById('lg-kz').classList.toggle('on', l === 'kz');
       applyI18n();
+      if (SESSION_ROLE) enterApp(SESSION_ROLE);
       renderModules();
       renderStudents();
       renderDashStats();
@@ -1072,6 +1153,7 @@
     applyI18n();
     renderModules();
     renderDashStats();
+    (function(){ const s = localStorage.getItem('ba_session_role'); if (s === 'super' || s === 'admin') enterApp(s); })();
   </script>
 </body>
 </html>
