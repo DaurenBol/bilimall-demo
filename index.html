@@ -552,7 +552,9 @@
   <script src="questions.js"></script>
   <script src="students.js"></script>
   <script>
-    const AUTH = { 'superadmin':{ pass:'Dauren7328620', role:'super' }, 'admin':{ pass:'Admin1234!', role:'admin' } };
+    const AUTH = { 'superadmin':{ hash:'2333a9b227fe5674c24a0673b051e28e3328dac15284ba8d7e5c2a17ff7f9b12', role:'super' }, 'admin':{ hash:'625e6f2f13d1a10a2d5c4173177e99cbdde8d37961fd26a8c810e75f78ed1185', role:'admin' } };
+    const AUTH_SALT = 'bilimall::v1::';
+    async function sha256hex(s){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join(''); }
     let SESSION_ROLE = null;
     function roleLabelText(){
       const kz = LANG === 'kz';
@@ -560,11 +562,12 @@
         ? (kz ? 'Әкімші-бақылаушы' : 'Админ-обозреватель')
         : (kz ? 'Суперәкімші · Курс жетекшісі' : 'Суперадмин · Ведущий курса');
     }
-    function doAuth(){
+    async function doAuth(){
       const l = document.getElementById('lg-login').value.trim().toLowerCase();
       const p = document.getElementById('lg-pass').value;
       const a = AUTH[l];
-      if (!a || a.pass !== p){ document.getElementById('lg-err').style.display = 'block'; return; }
+      const ok = a && (await sha256hex(AUTH_SALT + p)) === a.hash;
+      if (!ok){ document.getElementById('lg-err').style.display = 'block'; return; }
       document.getElementById('lg-err').style.display = 'none';
       localStorage.setItem('ba_session_role', a.role);
       enterApp(a.role);
