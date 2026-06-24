@@ -577,8 +577,19 @@
       else { rb.textContent = kz ? 'БАҚЫЛАУШЫ' : 'ОБОЗРЕВАТЕЛЬ'; rb.style.cssText = 'background:rgba(255,255,255,.15);color:#cdd5e4'; }
       if (window.STUDENTS){ renderModules(); renderDashStats(); }
       startDaysSync();
+      resetIdle();
     }
+    let idleTimer = null;
+    const IDLE_MS = 3 * 60 * 1000;
+    function resetIdle(){
+      if (!SESSION_ROLE) return;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => { logout(); }, IDLE_MS);
+    }
+    ['mousemove','mousedown','keydown','scroll','touchstart','click'].forEach(ev =>
+      document.addEventListener(ev, resetIdle, { passive: true }));
     function logout(){
+      clearTimeout(idleTimer);
       try { fetch('/api/logout', { method:'POST' }); } catch(e){}
       SESSION_ROLE = null;
       document.body.classList.remove('role-admin');
