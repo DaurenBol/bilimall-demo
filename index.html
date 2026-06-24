@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BilimAll</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, system-ui, sans-serif; background: #eef1f7; min-height: 100vh; color: #1f2d52; }
+
+  header { background: linear-gradient(120deg, #1a2647, #26356a 60%, #2c3e7a); box-shadow: 0 2px 16px rgba(20,30,70,.25); }
+  .bar { max-width: 1180px; margin: 0 auto; padding: 13px 20px; display: flex; align-items: center; gap: 13px; }
+  .logo { width: 40px; height: 40px; border-radius: 11px; background: #e8a317; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(232,163,23,.4); }
+  .badge { font-size: 9px; font-weight: 700; letter-spacing: .1em; background: rgba(232,163,23,.18); color: #f5c252; padding: 3px 8px; border-radius: 6px; }
+  .domain { font-size: 11px; color: rgba(255,255,255,.5); }
+  .brand { font-size: 14.5px; font-weight: 700; margin-top: 3px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lang { display: flex; background: rgba(255,255,255,.1); border-radius: 10px; padding: 3px; flex-shrink: 0; }
+  .lang button { border: none; cursor: pointer; font-size: 12px; font-weight: 700; padding: 6px 11px; border-radius: 8px; background: transparent; color: rgba(255,255,255,.7); }
+  .lang button.on { background: #e8a317; color: #1f2d52; }
+  .login { background: transparent; border: 1px solid rgba(255,255,255,.25); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; padding: 8px 15px; border-radius: 10px; flex-shrink: 0; }
+
+  .shell { max-width: 1180px; margin: 0 auto; display: flex; gap: 22px; padding: 22px 20px; align-items: flex-start; }
+  .side { width: 210px; flex-shrink: 0; background: #fff; border-radius: 16px; box-shadow: 0 4px 18px rgba(31,45,82,.06); padding: 12px; position: sticky; top: 20px; }
+  .side .grp { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: #9aa3ba; padding: 14px 12px 6px; }
+  .nav { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 10px; font-size: 13.5px; font-weight: 600; color: #64708c; cursor: pointer; border-left: 3px solid transparent; }
+  .nav:hover { background: #f4f6fb; }
+  .nav.on { background: rgba(232,163,23,.12); color: #1f2d52; border-left-color: #e8a317; }
+  .nav svg { flex-shrink: 0; }
+  .pill { margin-left: auto; font-size: 11px; font-weight: 700; background: #eef1f7; color: #1f2d52; padding: 2px 8px; border-radius: 7px; }
+
+  main { flex: 1; min-width: 0; }
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+  .search { flex: 1; display: flex; align-items: center; gap: 9px; background: #fff; border: 1.5px solid #e3e8f3; border-radius: 12px; padding: 11px 14px; color: #9aa3ba; font-size: 14px; }
+  .create { display: flex; align-items: center; gap: 7px; background: #1f2d52; color: #fff; border: none; border-radius: 12px; padding: 12px 18px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .sub { font-size: 13px; color: #64708c; margin-top: 4px; }
+
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+  .metric { background: #fff; border: 1px solid #e8ecf5; border-radius: 16px; padding: 18px; box-shadow: 0 4px 18px rgba(31,45,82,.05); }
+  .metric .top { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #64708c; font-weight: 600; }
+  .metric .num { font-size: 32px; font-weight: 800; letter-spacing: -.02em; margin-top: 8px; }
+  .delta { font-size: 12px; font-weight: 600; margin-top: 5px; }
+  .up { color: #15803d; } .down { color: #c4485a; }
+
+  .cols { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 22px; }
+  .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 18px rgba(31,45,82,.06); overflow: hidden; }
+  .card .head { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #eef1f7; }
+  .card .head .t { font-size: 17px; font-weight: 800; flex: 1; }
+  .link { font-size: 13px; font-weight: 600; color: #e8a317; cursor: pointer; }
+  .thead { display: grid; grid-template-columns: 2.2fr .9fr .7fr 1fr; gap: 10px; padding: 11px 20px; font-size: 11px; font-weight: 700; color: #8a93ad; letter-spacing: .04em; }
+  .row { display: grid; grid-template-columns: 2.2fr .9fr .7fr 1fr; gap: 10px; padding: 13px 20px; border-top: 1px solid #f4f6fb; align-items: center; }
+  .course { display: flex; align-items: center; gap: 11px; }
+  .cico { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ctitle { font-size: 14px; font-weight: 700; }
+  .cmeta { font-size: 11.5px; color: #8a93ad; margin-top: 1px; }
+  .status { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; justify-self: start; }
+  .s-active { background: #dcfce7; color: #15803d; }
+  .s-soon { background: #fef3c7; color: #a16207; }
+  .s-draft { background: #eef1f7; color: #64708c; }
+  .pcount { font-size: 13.5px; font-weight: 600; }
+  .prog { height: 7px; background: #eef1f7; border-radius: 6px; overflow: hidden; }
+  .prog > span { display: block; height: 100%; background: linear-gradient(90deg,#15803d,#22a85a); border-radius: 6px; }
+
+  .cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 18px; }
+  .ccard { background: #fff; border-radius: 16px; box-shadow: 0 4px 18px rgba(31,45,82,.06); padding: 18px; display: flex; align-items: center; gap: 13px; }
+  .ccard .ctitle { font-size: 15.5px; }
+  .addcard { border: 2px dashed #cdd5e4; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #64708c; font-size: 14px; font-weight: 600; cursor: pointer; min-height: 92px; }
+  .addcard:hover { border-color: #e8a317; color: #1f2d52; background: rgba(232,163,23,.06); }
+  .plus { width: 38px; height: 38px; border-radius: 50%; background: #e8a317; color: #1f2d52; display: flex; align-items: center; justify-content: center; }
+
+  .crumbs { font-size: 13px; color: #64708c; font-weight: 500; margin-bottom: 7px; }
+  .crumbs a { color: #185fa5; cursor: pointer; }
+  .chead { display: flex; align-items: flex-start; gap: 14px; }
+  .chead h1 { flex: 1; }
+  .back2 { background: #fff; border: 1.5px solid #e3e8f3; border-radius: 11px; padding: 11px 16px; font-size: 14px; font-weight: 700; color: #1f2d52; cursor: pointer; white-space: nowrap; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid #e3e8f3; margin: 20px 0 18px; }
+  .tab { display: flex; align-items: center; gap: 7px; padding: 11px 14px; font-size: 14px; font-weight: 600; color: #64708c; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab.on { color: #1f2d52; border-bottom-color: #1f2d52; }
+  .banner { background: #eef3fb; border: 1px solid #d8e3f4; border-radius: 12px; padding: 13px 16px; font-size: 13px; color: #3a4a6b; line-height: 1.5; margin-bottom: 16px; }
+  .module { background: #fff; border-radius: 14px; box-shadow: 0 4px 18px rgba(31,45,82,.06); margin-bottom: 12px; overflow: hidden; }
+  .mhead { display: flex; align-items: flex-start; gap: 12px; padding: 15px 18px; cursor: pointer; }
+  .mhead:hover { background: #f9fafd; }
+  .mday { font-size: 11.5px; font-weight: 700; color: #8a93ad; margin-bottom: 4px; }
+  .msub { font-size: 12.5px; color: #7a85a0; margin-top: 4px; }
+  .mtags { display: flex; align-items: center; gap: 7px; margin-top: 10px; font-size: 11.5px; color: #8a93ad; flex-wrap: wrap; }
+  .catbadge { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 7px; }
+  .mstatus { font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 8px; white-space: nowrap; flex-shrink: 0; }
+  .mright { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding-top: 2px; }
+  .drag { display: flex; flex-shrink: 0; }
+  .mnum { width: 30px; height: 30px; border: 1.5px solid #d6deec; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #1f2d52; flex-shrink: 0; }
+  .mtitle { flex: 1; min-width: 0; }
+  .mtitle .mt { font-size: 15.5px; font-weight: 700; }
+  .mmeta { font-size: 12px; color: #8a93ad; margin-top: 2px; }
+  .chev { transition: .15s; }
+  .module.open .chev { transform: rotate(90deg); }
+  .mbody { display: none; padding: 4px 18px 16px; border-top: 1px solid #eef1f7; }
+  .module.open .mbody { display: block; }
+  .lesson { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f4f6fb; cursor: pointer; }
+  .lico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ltitle { font-size: 14px; font-weight: 600; }
+  .lmeta { font-size: 11.5px; color: #8a93ad; margin-top: 1px; }
+  .lchev { margin-left: auto; flex-shrink: 0; transition: .15s; }
+  .litem.open .lchev { transform: rotate(90deg); }
+  .lbody { display: none; padding: 12px 0 16px 46px; }
+  .litem.open .lbody { display: block; }
+  .pdfframe { width: 100%; height: 460px; border: 1px solid #e3e8f3; border-radius: 12px; }
+  .lbtn { display: inline-flex; align-items: center; gap: 7px; background: #1f2d52; color: #fff; border: none; border-radius: 10px; padding: 10px 15px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; text-decoration: none; }
+  .lbtn.ghost { background: #fff; color: #1f2d52; border: 1.5px solid #e3e8f3; }
+  .vidrow { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
+  .vidrow input[type=url] { flex: 1; min-width: 200px; padding: 10px 13px; border: 1.5px solid #e3e8f3; border-radius: 10px; font-size: 13.5px; outline: none; }
+  .vidplayer { margin-top: 12px; }
+  .vidplayer video, .vidplayer iframe { width: 100%; max-width: 640px; height: 360px; border: none; border-radius: 12px; background: #000; }
+  .qday { padding: 13px 0; border-bottom: 1px solid #f0f3f9; }
+  .qday:last-child { border-bottom: none; }
+  .tgrid { display: grid; grid-template-columns: 2fr 1fr .8fr .9fr .8fr; gap: 10px; align-items: center; }
+  .tgrid.sthead { font-size: 11px; font-weight: 700; color: #8a93ad; letter-spacing: .03em; padding: 12px 20px; border-bottom: 1px solid #eef1f7; }
+  .trow { padding: 14px 20px; border-top: 1px solid #f4f6fb; font-size: 13.5px; }
+  .rcourse { cursor: pointer; justify-content: space-between; transition: .15s; }
+  .rcourse.sel { border: 2px solid #1f2d52; }
+  .rcourse:hover { box-shadow: 0 8px 22px rgba(31,45,82,.12); }
+  .rmetrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 18px 0; }
+  .rgrid { display: grid; gap: 8px; align-items: center; }
+  .rgrid.sthead { font-size: 11px; font-weight: 700; color: #8a93ad; letter-spacing: .03em; padding: 12px 18px; border-bottom: 1px solid #eef1f7; }
+  .rrow { padding: 12px 18px; border-top: 1px solid #f4f6fb; font-size: 13px; }
+  .rscore { font-weight: 700; text-align: center; }
+  .rtot { font-weight: 800; text-align: center; }
+  .achart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+  .acard { background: #fff; border-radius: 16px; box-shadow: 0 4px 18px rgba(31,45,82,.06); padding: 18px 20px; }
+  .acard h3 { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  .acard .ahint { font-size: 12px; color: #8a93ad; margin-bottom: 12px; }
+  .chartbox { position: relative; height: 250px; }
+  @media (max-width: 900px){ .achart-grid { grid-template-columns: 1fr; } }
+
+  .setcard { background: #fff; border-radius: 16px; box-shadow: 0 4px 18px rgba(31,45,82,.06); padding: 22px 24px; margin-bottom: 16px; max-width: 680px; }
+  .setcard h3 { font-size: 16px; font-weight: 800; margin-bottom: 3px; }
+  .setcard .shint { font-size: 12.5px; color: #8a93ad; margin-bottom: 18px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 600; color: #64708c; margin-bottom: 6px; }
+  .field input { width: 100%; padding: 11px 13px; border: 1.5px solid #e3e8f3; border-radius: 11px; font-size: 14.5px; color: #1f2d52; outline: none; font-family: Inter, sans-serif; }
+  .field input:focus { border-color: #1f2d52; }
+  .field input:disabled { background: #f6f8fc; color: #8a93ad; }
+  .frow { display: flex; gap: 12px; } .frow .field { flex: 1; }
+  .sbtn { background: #1f2d52; color: #fff; border: none; border-radius: 11px; padding: 12px 20px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: Inter, sans-serif; }
+  .sbtn.ghost { background: #eef1f7; color: #1f2d52; }
+  .sbtn.danger { background: #fff; color: #c4485a; border: 1.5px solid #f3c2c9; }
+  .smsg { font-size: 13px; font-weight: 600; margin-top: 10px; min-height: 16px; }
+  .smsg.ok { color: #15803d; } .smsg.err { color: #c4485a; }
+  .setrow { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid #f0f3f9; }
+  .setrow:first-of-type { border-top: none; }
+  .setrow .sl { flex: 1; } .setrow .sl .t { font-size: 14px; font-weight: 600; } .setrow .sl .d { font-size: 12px; color: #8a93ad; margin-top: 2px; }
+  .toggle { display: inline-flex; width: 44px; height: 25px; border-radius: 13px; border: none; cursor: pointer; padding: 3px; transition: .15s; align-items: center; background: #cdd5e4; flex-shrink: 0; justify-content: flex-start; }
+  .toggle.on { background: #15803d; justify-content: flex-end; }
+  .toggle span { display: block; width: 19px; height: 19px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+  .sethead { font-size: 22px; font-weight: 800; }
+  .langpick { display: flex; gap: 8px; }
+  .langpick button { border: 1.5px solid #d6deec; background: #fff; color: #64708c; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 10px; cursor: pointer; }
+  .langpick button.on { border-color: #1f2d52; background: #1f2d52; color: #fff; }
+  .setcard.danger-zone { border: 1px solid #f3c2c9; }
+  .field select, .acc select { border: 1.5px solid #e3e8f3; border-radius: 11px; font-size: 14px; color: #1f2d52; outline: none; font-family: Inter, sans-serif; background: #fff; cursor: pointer; }
+  .field select { width: 100%; padding: 11px 13px; }
+  .acc { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-top: 1px solid #f0f3f9; }
+  .acc:first-of-type { border-top: none; }
+  .accav { width: 36px; height: 36px; border-radius: 50%; background: #1f2d52; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .acc .ai { flex: 1; min-width: 0; } .acc .an { font-size: 14px; font-weight: 600; } .acc .ae { font-size: 12px; color: #8a93ad; }
+  .rolebadge { font-size: 10.5px; font-weight: 700; padding: 5px 11px; border-radius: 8px; white-space: nowrap; }
+  .acc select { padding: 7px 10px; font-size: 12.5px; }
+  .accdel { background: none; border: none; cursor: pointer; color: #c4485a; padding: 6px; flex-shrink: 0; }
+  .soon { display: flex; align-items: center; gap: 12px; background: #f6f8fc; border: 1px dashed #d6deec; border-radius: 12px; padding: 16px 18px; color: #64708c; font-size: 13.5px; }
+  .soonbadge { font-size: 10px; font-weight: 700; background: #fef3c7; color: #a16207; padding: 3px 9px; border-radius: 7px; margin-left: auto; }
+  .addbtns { display: flex; gap: 9px; margin-top: 14px; flex-wrap: wrap; }
+  .addbtns button { background: #fff; border: 1.5px solid #e3e8f3; color: #64708c; font-size: 12.5px; font-weight: 600; padding: 8px 13px; border-radius: 9px; cursor: pointer; }
+  .addbtns button:hover { border-color: #e8a317; color: #1f2d52; }
+  .addmod { background: #1f2d52; color: #fff; border: none; border-radius: 11px; padding: 12px 18px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 4px; display: inline-flex; gap: 7px; align-items: center; }
+
+  .q { padding: 14px 0; border-bottom: 1px solid #f0f3f9; }
+  .q:last-child { border-bottom: none; }
+  .qtext { display: flex; gap: 10px; font-size: 14.5px; font-weight: 600; line-height: 1.4; }
+  .qnum { width: 24px; height: 24px; flex-shrink: 0; border-radius: 7px; background: #eef1f7; color: #1f2d52; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .opts { display: flex; flex-direction: column; gap: 7px; margin-top: 11px; padding-left: 34px; }
+  .opt { display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: #1f2d52; border: 1.5px solid #e7ebf4; border-radius: 10px; padding: 9px 12px; }
+  .opt.ok { border-color: #bbf0cd; background: #f0fdf4; color: #15803d; font-weight: 600; }
+  .opt .letter { width: 22px; height: 22px; flex-shrink: 0; border-radius: 6px; background: #eef1f7; color: #64708c; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .opt.ok .letter { background: #15803d; color: #fff; }
+  .opt .check { margin-left: auto; flex-shrink: 0; }
+  .placeholder { background: #fff; border-radius: 16px; padding: 44px; text-align: center; color: #9aa3ba; font-size: 14px; box-shadow: 0 4px 18px rgba(31,45,82,.05); }
+
+  .stoolbar { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 14px; }
+  .scount { font-size: 13px; color: #64708c; font-weight: 600; margin-right: 4px; }
+  .gchip { border: 1px solid #d6deec; background: #fff; color: #64708c; font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 20px; cursor: pointer; }
+  .gchip.on { border-color: #1f2d52; background: #1f2d52; color: #fff; }
+  .pchip { border: 1px solid #d6deec; background: #fff; color: #64708c; font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 20px; cursor: pointer; }
+  .pchip.on { border-color: #1f2d52; background: #1f2d52; color: #fff; }
+  .periodbar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .invite { background: #1f2d52; color: #fff; border: none; border-radius: 11px; padding: 11px 18px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .stable { background: #fff; border-radius: 16px; box-shadow: 0 4px 18px rgba(31,45,82,.06); overflow: hidden; }
+  .listhead { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid #eef1f7; }
+  .listhead .lt { font-size: 16px; font-weight: 800; flex: 1; }
+  .csv { font-size: 13px; font-weight: 600; color: #185fa5; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .sgrid { display: grid; grid-template-columns: 2.3fr .9fr 1.8fr .7fr; gap: 10px; align-items: center; }
+  .sthead { font-size: 11px; font-weight: 700; color: #8a93ad; letter-spacing: .03em; padding: 12px 20px; border-bottom: 1px solid #eef1f7; }
+  .avg { font-size: 14px; font-weight: 800; color: #1f2d52; text-align: right; }
+  .progwrap { display: flex; align-items: center; gap: 10px; }
+  .progwrap .prog { flex: 1; }
+  .proglbl { font-size: 11.5px; color: #8a93ad; font-weight: 600; white-space: nowrap; }
+  .srow { padding: 11px 18px; border-top: 1px solid #f4f6fb; font-size: 13px; }
+  .savatar { width: 30px; height: 30px; border-radius: 50%; background: #1f2d52; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .sname { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .sname .nm { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sphone { color: #64708c; font-size: 12.5px; }
+  .sgrp { font-size: 11px; font-weight: 700; background: #eef1f7; color: #1f2d52; padding: 3px 9px; border-radius: 7px; justify-self: start; }
+  .res { font-size: 11.5px; font-weight: 700; padding: 4px 0; border-radius: 7px; text-align: center; }
+  .r-hi { background: #dcfce7; color: #15803d; }
+  .r-mid { background: #fef3c7; color: #a16207; }
+  .center { text-align: center; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f2d52" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge">КУРС</span>
+          <span class="domain">bilimall.kz</span>
+        </div>
+        <div class="brand" data-ru="Курс «ИИ в работе преподавателя»" data-kz="«ЖИ оқытушы жұмысында» курсы">Курс «ИИ в работе преподавателя»</div>
+      </div>
+      <div class="lang">
+        <button id="kz" onclick="setLang('kz')">ҚАЗ</button>
+        <button id="ru" class="on" onclick="setLang('ru')">РУС</button>
+      </div>
+      <button class="login" data-ru="Войти" data-kz="Кіру">Войти</button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="side">
+      <div class="grp" data-ru="ГЛАВНОЕ" data-kz="НЕГІЗГІ">ГЛАВНОЕ</div>
+      <div class="nav on" onclick="nav(this,'dash')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span data-ru="Дашборд" data-kz="Бақылау тақтасы">Дашборд</span></div>
+      <div class="nav" onclick="nav(this,'courses')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-ru="Курсы" data-kz="Курстар">Курсы</span><span class="pill">1</span></div>
+      <div class="nav" onclick="nav(this,'reports')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg><span data-ru="Отчёты" data-kz="Есептер">Отчёты</span></div>
+      <div class="grp" data-ru="ЛЮДИ" data-kz="АДАМДАР">ЛЮДИ</div>
+      <div class="nav" onclick="nav(this,'students')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span data-ru="Ученики" data-kz="Оқушылар">Ученики</span><span class="pill">105</span></div>
+      <div class="nav" onclick="nav(this,'leads')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-ru="Ведущие курсов" data-kz="Курс жетекшілері">Ведущие курсов</span></div>
+      <div class="grp" data-ru="УПРАВЛЕНИЕ" data-kz="БАСҚАРУ">УПРАВЛЕНИЕ</div>
+      <div class="nav" onclick="nav(this,'analytics')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg><span data-ru="Аналитика" data-kz="Аналитика">Аналитика</span></div>
+      <div class="nav" onclick="nav(this,'settings')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span data-ru="Настройки" data-kz="Баптаулар">Настройки</span></div>
+    </aside>
+
+    <main>
+      <div class="toolbar">
+        <div class="search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><span data-ru="Поиск курсов, учеников, тестов…" data-kz="Курстар, оқушылар, тесттер іздеу…">Поиск курсов, учеников, тестов…</span></div>
+        <button class="create" onclick="document.querySelectorAll('.side .nav')[1].click()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-ru="Создать курс" data-kz="Курс құру">Создать курс</span></button>
+      </div>
+
+      <div id="view-dash">
+      <h1 data-ru="Дашборд" data-kz="Бақылау тақтасы">Дашборд</h1>
+      <div class="periodbar">
+        <button class="pchip" data-p="all" onclick="filterPeriod(this)" data-ru="За всё время" data-kz="Барлық уақыт">За всё время</button>
+        <button class="pchip on" data-p="30" onclick="filterPeriod(this)" data-ru="30 дней" data-kz="30 күн">30 дней</button>
+        <button class="pchip" data-p="90" onclick="filterPeriod(this)" data-ru="90 дней" data-kz="90 күн">90 дней</button>
+        <button class="pchip" data-p="15" onclick="filterPeriod(this)" data-ru="15 дней" data-kz="15 күн">15 дней</button>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span data-ru="Активные ученики" data-kz="Белсенді оқушылар">Активные ученики</span></div><div class="num" id="m-students">—</div><div class="delta" style="color:#64708c" id="m-students-sub"></div></div>
+        <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-ru="Всего учеников" data-kz="Барлық оқушы">Всего учеников</span></div><div class="num" id="m-total">—</div><div class="delta" style="color:#64708c" id="m-total-sub"></div></div>
+        <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-ru="Курсов запущено" data-kz="Іске қосылған курстар">Курсов запущено</span></div><div class="num" id="m-courses">—</div><div class="delta" style="color:#64708c" id="m-courses-sub"></div></div>
+        <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8a317" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span data-ru="Средняя оценка" data-kz="Орташа баға">Средняя оценка</span></div><div class="num" id="m-avg">—</div><div class="delta" style="color:#64708c" id="m-avg-sub"></div></div>
+      </div>
+
+      <div class="cols">
+        <div class="card" style="grid-column:1 / -1">
+          <div class="head"><div class="t" data-ru="Курсы" data-kz="Курстар">Курсы</div><div class="link" onclick="document.querySelectorAll('.side .nav')[1].click()" data-ru="Все курсы →" data-kz="Барлық курс →">Все курсы →</div></div>
+          <div class="thead"><span data-ru="КУРС" data-kz="КУРС">КУРС</span><span data-ru="СТАТУС" data-kz="МӘРТЕБЕ">СТАТУС</span><span data-ru="УЧЕНИКИ" data-kz="ОҚУШЫЛАР">УЧЕНИКИ</span><span data-ru="ПРОГРЕСС" data-kz="ПРОГРЕСС">ПРОГРЕСС</span></div>
+
+          <div class="row" style="cursor:pointer" onclick="goToCourse()">
+            <div class="course"><div class="cico" style="background:#e8edf7"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1f2d52" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div><div class="ctitle" data-ru="ИИ в работе преподавателя" data-kz="ЖИ оқытушы жұмысында">ИИ в работе преподавателя</div><div class="cmeta" data-ru="8 дней" data-kz="8 күн">8 дней</div></div></div>
+            <span class="status s-active" data-ru="Активен" data-kz="Белсенді">Активен</span>
+            <span class="pcount" id="c-students">105</span>
+            <div class="progwrap"><div class="prog"><span id="c-prog" style="width:50%"></span></div><span class="proglbl" id="c-proglbl"></span></div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div id="view-courses" hidden>
+        <h1 data-ru="Курсы" data-kz="Курстар">Курсы</h1>
+        <div class="sub" data-ru="Все курсы платформы" data-kz="Платформаның барлық курсы">Все курсы платформы</div>
+        <div class="cgrid">
+          <div class="ccard" style="cursor:pointer" onclick="openCourse()">
+            <div class="cico" style="background:#e8edf7"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f2d52" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+            <div><div class="ctitle" data-ru="ИИ в работе преподавателя" data-kz="ЖИ оқытушы жұмысында">ИИ в работе преподавателя</div><div class="cmeta" data-ru="8 дней · Активен" data-kz="8 күн · Белсенді">8 дней · Активен</div></div>
+          </div>
+          <div class="addcard" onclick="addCourse()">
+            <div class="plus"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12h14"/></svg></div>
+            <span data-ru="Добавить курс" data-kz="Курс қосу">Добавить курс</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-course" hidden>
+        <div class="crumbs"><a onclick="backToCourses()" data-ru="Курсы" data-kz="Курстар">Курсы</a> / <span data-ru="ИИ в работе преподавателя" data-kz="ЖИ оқытушы жұмысында">ИИ в работе преподавателя</span></div>
+        <div class="chead">
+          <div><h1 data-ru="ИИ в работе преподавателя" data-kz="ЖИ оқытушы жұмысында">ИИ в работе преподавателя</h1><div class="sub" data-ru="Управление содержимым этого курса" data-kz="Осы курстың мазмұнын басқару">Управление содержимым этого курса</div></div>
+          <button class="back2" onclick="backToCourses()" data-ru="← Назад к курсам" data-kz="← Курстарға қайту">← Назад к курсам</button>
+        </div>
+        <div class="tabs">
+          <div class="tab on" data-tab="content" onclick="courseTab(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg><span data-ru="Содержание" data-kz="Мазмұны">Содержание</span></div>
+          <div class="tab" data-tab="tests" onclick="courseTab(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span data-ru="Тесты" data-kz="Тесттер">Тесты</span></div>
+          <div class="tab" data-tab="students" onclick="courseTab(this)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span data-ru="Ученики" data-kz="Оқушылар">Ученики</span></div>
+        </div>
+
+        <div id="ct-content">
+          <div class="banner" data-ru="Здесь добавляются материалы. Модуль → уроки внутри. Каждый урок — это рабочая тетрадь (PDF), видео или тест. Нажми на модуль, чтобы раскрыть." data-kz="Мұнда материалдар қосылады. Модуль → ішінде сабақтар. Әр сабақ — жұмыс дәптері (PDF), бейне немесе тест. Ашу үшін модульді басыңыз.">Здесь добавляются материалы. Модуль → уроки внутри. Каждый урок — это рабочая тетрадь (PDF), видео или тест. Нажми на модуль, чтобы раскрыть.</div>
+          <div id="modules"></div>
+          <button class="addmod"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span data-ru="Добавить модуль" data-kz="Модуль қосу">Добавить модуль</span></button>
+        </div>
+
+        <div id="ct-tests" hidden>
+          <div class="banner" data-ru="Это тесты курса «ИИ в работе преподавателя». Каждый тест привязан к дню курса в «Содержании»." data-kz="Бұл «ЖИ оқытушы жұмысында» курсының тесттері. Әр тест «Мазмұны» бөліміндегі курс күніне байланысқан.">Это тесты курса «ИИ в работе преподавателя». Каждый тест привязан к дню курса в «Содержании».</div>
+          <div class="stable">
+            <div class="listhead"><div class="lt" data-ru="Тесты курса" data-kz="Курс тесттері">Тесты курса</div></div>
+            <div class="tgrid sthead">
+              <span data-ru="ТЕСТ" data-kz="ТЕСТ">ТЕСТ</span>
+              <span data-ru="ПРИВЯЗАН К" data-kz="БАЙЛАНЫСҚАН">ПРИВЯЗАН К</span>
+              <span data-ru="ВОПРОСОВ" data-kz="СҰРАҚ">ВОПРОСОВ</span>
+              <span data-ru="ПРОХОДНОЙ" data-kz="ӨТУ БАЛЛЫ">ПРОХОДНОЙ</span>
+              <span data-ru="СР. БАЛЛ" data-kz="ОРТ. БАЛЛ">СР. БАЛЛ</span>
+            </div>
+            <div id="tests"></div>
+          </div>
+        </div>
+
+        <div id="ct-students" hidden>
+          <div class="stoolbar">
+            <button class="gchip on" data-g="0" onclick="filterGroup(this)" data-ru="Все" data-kz="Барлығы">Все</button>
+            <button class="gchip" data-g="1" onclick="filterGroup(this)">1-топ</button>
+            <button class="gchip" data-g="2" onclick="filterGroup(this)">2-топ</button>
+            <button class="gchip" data-g="3" onclick="filterGroup(this)">3-топ</button>
+            <button class="gchip" data-g="4" onclick="filterGroup(this)">4-топ</button>
+          </div>
+          <div class="stable">
+            <div class="listhead"><div class="lt"><span data-ru="Список" data-kz="Тізім">Список</span> (<span data-scount>105</span>)</div><div class="csv" onclick="exportStudentsCsv()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg><span data-ru="Экспорт CSV" data-kz="CSV экспорт">Экспорт CSV</span></div></div>
+            <div class="sgrid sthead">
+              <span data-ru="УЧЕНИК" data-kz="ОҚУШЫ">УЧЕНИК</span>
+              <span data-ru="ГРУППА" data-kz="ТОБЫ">ГРУППА</span>
+              <span data-ru="ПРОГРЕСС" data-kz="ПРОГРЕСС">ПРОГРЕСС</span>
+              <span style="text-align:right" data-ru="СР. БАЛЛ" data-kz="ОРТ. БАЛЛ">СР. БАЛЛ</span>
+            </div>
+            <div data-srows></div>
+          </div>
+        </div>
+
+        <div id="ct-other" hidden><div class="placeholder" data-ru="Раздел в разработке" data-kz="Бөлім әзірленуде">Раздел в разработке</div></div>
+      </div>
+
+      <div id="view-leads" hidden>
+        <h1 data-ru="Ведущие курсов" data-kz="Курс жетекшілері">Ведущие курсов</h1>
+        <div class="sub" data-ru="Преподаватели и кураторы, ведущие курсы платформы" data-kz="Платформа курстарын жүргізетін оқытушылар мен кураторлар">Преподаватели и кураторы, ведущие курсы платформы</div>
+        <div class="cgrid" id="leads-list" style="margin-top:18px"></div>
+      </div>
+
+      <div id="view-settings" hidden>
+        <h1 data-ru="Настройки" data-kz="Баптаулар">Настройки</h1>
+        <div class="sub" data-ru="Управление аккаунтом, паролем и безопасностью" data-kz="Аккаунт, құпиясөз және қауіпсіздікті басқару">Управление аккаунтом, паролем и безопасностью</div>
+        <div style="margin-top:18px"></div>
+
+        <div class="setcard">
+          <h3 data-ru="Профиль" data-kz="Профиль">Профиль</h3>
+          <div class="shint" data-ru="Личные данные владельца аккаунта" data-kz="Аккаунт иесінің жеке деректері">Личные данные владельца аккаунта</div>
+          <div class="frow">
+            <div class="field"><label data-ru="Имя" data-kz="Аты">Имя</label><input id="set-first" type="text"></div>
+            <div class="field"><label data-ru="Фамилия" data-kz="Тегі">Фамилия</label><input id="set-last" type="text"></div>
+          </div>
+          <div class="field"><label data-ru="Email" data-kz="Email">Email</label><input id="set-email" type="email"></div>
+          <div class="field"><label data-ru="Телефон" data-kz="Телефон">Телефон</label><input id="set-phone" type="tel"></div>
+          <div class="field"><label data-ru="Организация" data-kz="Ұйым">Организация</label><input id="set-org" type="text"></div>
+          <div class="field"><label data-ru="Роль" data-kz="Рөл">Роль</label><input id="set-role" type="text" disabled></div>
+          <button class="sbtn" onclick="saveProfile()" data-ru="Сохранить изменения" data-kz="Өзгерістерді сақтау">Сохранить изменения</button>
+          <div class="smsg" id="msg-profile"></div>
+        </div>
+
+        <div class="setcard">
+          <h3 data-ru="Смена пароля" data-kz="Құпиясөзді ауыстыру">Смена пароля</h3>
+          <div class="shint" data-ru="Минимум 6 символов. Демо-пароль: 1234" data-kz="Кемінде 6 таңба. Демо-құпиясөз: 1234">Минимум 6 символов. Демо-пароль: 1234</div>
+          <div class="field"><label data-ru="Текущий пароль" data-kz="Ағымдағы құпиясөз">Текущий пароль</label><input id="set-pw-cur" type="password"></div>
+          <div class="frow">
+            <div class="field"><label data-ru="Новый пароль" data-kz="Жаңа құпиясөз">Новый пароль</label><input id="set-pw-new" type="password"></div>
+            <div class="field"><label data-ru="Повторите пароль" data-kz="Құпиясөзді қайталаңыз">Повторите пароль</label><input id="set-pw-rep" type="password"></div>
+          </div>
+          <button class="sbtn" onclick="changePassword()" data-ru="Изменить пароль" data-kz="Құпиясөзді ауыстыру">Изменить пароль</button>
+          <div class="smsg" id="msg-pw"></div>
+        </div>
+
+        <div class="setcard">
+          <h3 data-ru="Уведомления" data-kz="Хабарламалар">Уведомления</h3>
+          <div class="shint" data-ru="Что присылать на вашу почту" data-kz="Поштаңызға не жіберілсін">Что присылать на вашу почту</div>
+          <div class="setrow"><div class="sl"><div class="t" data-ru="Email-уведомления" data-kz="Email-хабарламалар">Email-уведомления</div><div class="d" data-ru="Важные события по курсу" data-kz="Курс бойынша маңызды оқиғалар">Важные события по курсу</div></div><button class="toggle" data-nk="email" onclick="toggleNotif('email')"><span></span></button></div>
+          <div class="setrow"><div class="sl"><div class="t" data-ru="Еженедельный отчёт" data-kz="Апталық есеп">Еженедельный отчёт</div><div class="d" data-ru="Сводка по ученикам раз в неделю" data-kz="Аптасына бір рет оқушылар жиынтығы">Сводка по ученикам раз в неделю</div></div><button class="toggle" data-nk="weekly" onclick="toggleNotif('weekly')"><span></span></button></div>
+          <div class="setrow"><div class="sl"><div class="t" data-ru="Новые ученики" data-kz="Жаңа оқушылар">Новые ученики</div><div class="d" data-ru="Уведомлять о регистрациях" data-kz="Тіркелулер туралы хабарлау">Уведомлять о регистрациях</div></div><button class="toggle" data-nk="newStudents" onclick="toggleNotif('newStudents')"><span></span></button></div>
+        </div>
+
+        <div class="setcard">
+          <h3 data-ru="Безопасность" data-kz="Қауіпсіздік">Безопасность</h3>
+          <div class="shint" data-ru="Защита аккаунта и язык интерфейса" data-kz="Аккаунтты қорғау және интерфейс тілі">Защита аккаунта и язык интерфейса</div>
+          <div class="setrow"><div class="sl"><div class="t" data-ru="Двухфакторная аутентификация" data-kz="Екі факторлы аутентификация">Двухфакторная аутентификация</div><div class="d" data-ru="Код подтверждения при входе" data-kz="Кіру кезінде растау коды">Код подтверждения при входе</div></div><button class="toggle" id="tg-twofa" onclick="toggleTwofa()"><span></span></button></div>
+          <div class="setrow"><div class="sl"><div class="t" data-ru="Язык интерфейса" data-kz="Интерфейс тілі">Язык интерфейса</div><div class="d" data-ru="Применяется ко всему сайту" data-kz="Бүкіл сайтқа қолданылады">Применяется ко всему сайту</div></div><div class="langpick"><button id="set-lang-kz" onclick="setLang('kz')">ҚАЗ</button><button id="set-lang-ru" onclick="setLang('ru')">РУС</button></div></div>
+        </div>
+
+        <div class="setcard">
+          <h3 data-ru="Команда и доступы" data-kz="Команда және рұқсаттар">Команда и доступы</h3>
+          <div class="shint" data-ru="Создавайте аккаунты сотрудников и назначайте роли" data-kz="Қызметкерлерге аккаунт құрып, рөлдерді тағайындаңыз">Создавайте аккаунты сотрудников и назначайте роли</div>
+          <div class="frow">
+            <div class="field"><label data-ru="Имя сотрудника" data-kz="Қызметкердің аты">Имя сотрудника</label><input id="acc-name" type="text"></div>
+            <div class="field"><label data-ru="Email" data-kz="Email">Email</label><input id="acc-email" type="email"></div>
+          </div>
+          <div class="frow" style="align-items:flex-end">
+            <div class="field" style="flex:1"><label data-ru="Роль" data-kz="Рөл">Роль</label><select id="acc-role"><option value="admin" data-ru="Администратор" data-kz="Әкімші">Администратор</option><option value="lead" data-ru="Ведущий курсов" data-kz="Курс жетекшісі">Ведущий курсов</option></select></div>
+            <div class="field" style="flex:0 0 auto"><button class="sbtn" onclick="createAccount()" data-ru="Создать аккаунт" data-kz="Аккаунт құру">Создать аккаунт</button></div>
+          </div>
+          <div class="smsg" id="msg-acc"></div>
+          <div id="accounts-list" style="margin-top:8px"></div>
+        </div>
+
+        <div class="setcard">
+          <h3 data-ru="Журнал входов" data-kz="Кіру журналы">Журнал входов</h3>
+          <div class="shint" data-ru="Кто и когда заходил, какие действия выполнял — доступно только супер-админу" data-kz="Кім қашан кірді, қандай әрекет жасады — тек супер-әкімшіге қолжетімді">Кто и когда заходил, какие действия выполнял — доступно только супер-админу</div>
+          <div class="soon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a93ad" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-ru="Журнал действий появится здесь" data-kz="Әрекеттер журналы осы жерде шығады">Журнал действий появится здесь</span><span class="soonbadge" data-ru="СКОРО" data-kz="ЖАҚЫНДА">СКОРО</span></div>
+        </div>
+
+        <div class="setcard">
+          <h3 data-ru="Сессия" data-kz="Сессия">Сессия</h3>
+          <div class="shint" data-ru="Завершить текущий сеанс" data-kz="Ағымдағы сеансты аяқтау">Завершить текущий сеанс</div>
+          <button class="sbtn ghost" onclick="accountLogout()" data-ru="Выйти из аккаунта" data-kz="Аккаунттан шығу">Выйти из аккаунта</button>
+        </div>
+      </div>
+
+      <div id="view-analytics" hidden>
+        <h1 data-ru="Аналитика" data-kz="Аналитика">Аналитика</h1>
+        <div class="sub" data-ru="Общая картина по курсу: модули, ученики, успеваемость и активность" data-kz="Курс бойынша жалпы көрініс: модульдер, оқушылар, үлгерім және белсенділік">Общая картина по курсу: модули, ученики, успеваемость и активность</div>
+        <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+          <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span data-ru="Учеников" data-kz="Оқушылар">Учеников</span></div><div class="num" id="an-students">—</div></div>
+          <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8a317" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span data-ru="Средний балл" data-kz="Орташа балл">Средний балл</span></div><div class="num" id="an-avg">—</div></div>
+          <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span data-ru="Дней пройдено" data-kz="Өткен күндер">Дней пройдено</span></div><div class="num" id="an-days">—</div></div>
+          <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg><span data-ru="Прошли порог" data-kz="Шектен өтті">Прошли порог</span></div><div class="num" id="an-pass">—</div></div>
+        </div>
+        <div class="achart-grid">
+          <div class="acard"><h3 data-ru="Средний балл по дням" data-kz="Күндер бойынша орташа балл">Средний балл по дням</h3><div class="ahint" data-ru="Средний результат теста по каждому дню курса" data-kz="Әр күн бойынша тесттің орташа нәтижесі">Средний результат теста по каждому дню курса</div><div class="chartbox"><canvas id="ch-days"></canvas></div></div>
+          <div class="acard"><h3 data-ru="Ученики по группам" data-kz="Топтар бойынша оқушылар">Ученики по группам</h3><div class="ahint" data-ru="Распределение 105 учеников по 4 группам" data-kz="105 оқушының 4 топ бойынша бөлінуі">Распределение 105 учеников по 4 группам</div><div class="chartbox"><canvas id="ch-groups"></canvas></div></div>
+          <div class="acard"><h3 data-ru="Активность по дням" data-kz="Күндер бойынша белсенділік">Активность по дням</h3><div class="ahint" data-ru="Сколько учеников прошли каждый день" data-kz="Әр күнді қанша оқушы өтті">Сколько учеников прошли каждый день</div><div class="chartbox"><canvas id="ch-progress"></canvas></div></div>
+          <div class="acard"><h3 data-ru="Распределение оценок" data-kz="Бағалардың бөлінуі">Распределение оценок</h3><div class="ahint" data-ru="Сколько учеников в каждом диапазоне среднего балла" data-kz="Әр орташа балл аралығында қанша оқушы">Сколько учеников в каждом диапазоне среднего балла</div><div class="chartbox"><canvas id="ch-dist"></canvas></div></div>
+        </div>
+      </div>
+
+      <div id="view-reports" hidden>
+        <div id="report-list">
+          <h1 data-ru="Отчёты" data-kz="Есептер">Отчёты</h1>
+          <div class="sub" data-ru="Выберите курс, чтобы открыть отчёт" data-kz="Есепті ашу үшін курсты таңдаңыз">Выберите курс, чтобы открыть отчёт</div>
+          <div class="cgrid" id="report-courses"></div>
+        </div>
+        <div id="report-detail" hidden>
+          <div class="crumbs"><a onclick="backToReports()" data-ru="Отчёты" data-kz="Есептер">Отчёты</a> / <span id="report-cname"></span></div>
+          <div class="chead">
+            <div><h1 id="report-title"></h1><div class="sub" data-ru="Отчёт по ученикам и баллам за пройденные дни" data-kz="Оқушылар мен өткен күндердің баллдары бойынша есеп">Отчёт по ученикам и баллам за пройденные дни</div></div>
+            <button class="back2" onclick="backToReports()" data-ru="← Назад к отчётам" data-kz="← Есептерге қайту">← Назад к отчётам</button>
+          </div>
+          <div id="report-body"></div>
+        </div>
+      </div>
+
+      <div id="view-students" hidden>
+        <div class="chead" style="margin-bottom:18px">
+          <div><h1 data-ru="Ученики" data-kz="Оқушылар">Ученики</h1><div class="sub" data-ru="Все ученики платформы по всем группам" data-kz="Платформаның барлық топтардағы оқушылары">Все ученики платформы по всем группам</div></div>
+          <button class="invite" onclick="alert('Пригласить ученика')" data-ru="+ Пригласить" data-kz="+ Шақыру">+ Пригласить</button>
+        </div>
+        <div class="stoolbar">
+          <button class="gchip on" data-g="0" onclick="filterGroup(this)" data-ru="Все" data-kz="Барлығы">Все</button>
+          <button class="gchip" data-g="1" onclick="filterGroup(this)">1-топ</button>
+          <button class="gchip" data-g="2" onclick="filterGroup(this)">2-топ</button>
+          <button class="gchip" data-g="3" onclick="filterGroup(this)">3-топ</button>
+          <button class="gchip" data-g="4" onclick="filterGroup(this)">4-топ</button>
+        </div>
+        <div class="stable">
+          <div class="listhead"><div class="lt"><span data-ru="Список" data-kz="Тізім">Список</span> (<span data-scount>105</span>)</div><div class="csv" onclick="exportStudentsCsv()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg><span data-ru="Экспорт CSV" data-kz="CSV экспорт">Экспорт CSV</span></div></div>
+          <div class="sgrid sthead">
+            <span data-ru="УЧЕНИК" data-kz="ОҚУШЫ">УЧЕНИК</span>
+            <span data-ru="ГРУППА" data-kz="ТОБЫ">ГРУППА</span>
+            <span data-ru="ПРОГРЕСС" data-kz="ПРОГРЕСС">ПРОГРЕСС</span>
+            <span style="text-align:right" data-ru="СР. БАЛЛ" data-kz="ОРТ. БАЛЛ">СР. БАЛЛ</span>
+          </div>
+          <div data-srows></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="questions.js"></script>
+  <script src="students.js"></script>
+  <script>
+    let LANG = 'ru';
+    function applyI18n(){
+      document.querySelectorAll('[data-ru]').forEach(el => {
+        el.textContent = LANG === 'kz' ? el.getAttribute('data-kz') : el.getAttribute('data-ru');
+      });
+    }
+    function setLang(l){
+      LANG = l;
+      document.getElementById('ru').classList.toggle('on', l === 'ru');
+      document.getElementById('kz').classList.toggle('on', l === 'kz');
+      applyI18n();
+      renderModules();
+      renderStudents();
+      renderDashStats();
+      renderTestsTable();
+      renderReportCourses();
+      if (!document.getElementById('view-analytics').hidden) renderAnalytics();
+      if (!document.getElementById('view-settings').hidden){
+        document.getElementById('set-lang-ru').classList.toggle('on', LANG === 'ru');
+        document.getElementById('set-lang-kz').classList.toggle('on', LANG === 'kz');
+        document.getElementById('set-role').value = LANG === 'kz' ? 'Суперәкімші · Курс жетекшісі' : (SETTINGS ? SETTINGS.role : 'Суперадмин · Ведущий курса');
+      }
+    }
+
+    function nav(el, view){
+      document.querySelectorAll('.side .nav').forEach(n => n.classList.remove('on'));
+      el.classList.add('on');
+      document.getElementById('view-dash').hidden = view !== 'dash';
+      document.getElementById('view-courses').hidden = view !== 'courses';
+      document.getElementById('view-students').hidden = view !== 'students';
+      document.getElementById('view-reports').hidden = view !== 'reports';
+      document.getElementById('view-analytics').hidden = view !== 'analytics';
+      document.getElementById('view-settings').hidden = view !== 'settings';
+      document.getElementById('view-leads').hidden = view !== 'leads';
+      document.getElementById('view-course').hidden = true;
+      if (view === 'students') renderStudents();
+      if (view === 'reports'){ backToReports(); renderReportCourses(); }
+      if (view === 'analytics') renderAnalytics();
+      if (view === 'settings') renderSettings();
+      if (view === 'leads') renderLeads();
+    }
+    function addCourse(){ alert(LANG === 'kz' ? 'Жаңа курс қосу' : 'Добавление нового курса'); }
+
+    const CATS = {
+      found:   { ru:'Фундамент', kz:'Негіз', bar:'#3b82f6', bg:'#e6f1fb', fg:'#185fa5' },
+      content: { ru:'Создание контента', kz:'Контент жасау', bar:'#14b8a6', bg:'#dcfce7', fg:'#15803d' },
+      ai:      { ru:'ИИ-ассистенты', kz:'ЖИ-көмекшілер', bar:'#e8a317', bg:'#fef3c7', fg:'#a16207' }
+    };
+    const DAYS_FULL = [
+      {n:1,title:'Сервисы Google. Фундамент',titleKz:'Google сервистері. Негіз',sub:'Аккаунт и Gmail',subKz:'Аккаунт және Gmail',date:'22 июня',dateKz:'22 маусым',wd:'пн',wdKz:'дс',cat:'found',tool:'Google',toolKz:'Google',q:7,pdf:'Тетрадь_День1_Google.pdf'},
+      {n:2,title:'Сервисы Google в работе',titleKz:'Google сервистері жұмыста',sub:'YouTube, Meet, Диск, Документы, Формы',subKz:'YouTube, Meet, Диск, Құжаттар, Формалар',date:'23 июня',dateKz:'23 маусым',wd:'вт',wdKz:'сс',cat:'found',tool:'Google',toolKz:'Google',q:7,pdf:'Тетрадь_День2_Google_сервисы.pdf'},
+      {n:3,title:'Gamma — презентации',titleKz:'Gamma — презентациялар',sub:'Презентация по описанию',subKz:'Сипаттама бойынша презентация',date:'24 июня',dateKz:'24 маусым',wd:'ср',wdKz:'ср',cat:'content',tool:'Gamma',toolKz:'Gamma',q:6,pdf:'Тетрадь_День3_Gamma.pdf'},
+      {n:4,title:'Sufleur Pro — телесуфлёр',titleKz:'Sufleur Pro — телесуфлёр',sub:'Видеообращение под камеру',subKz:'Камераға видеохабарлама',date:'25 июня',dateKz:'25 маусым',wd:'чт',wdKz:'бс',cat:'content',tool:'Sufleur Pro',toolKz:'Sufleur Pro',q:6,pdf:'Тетрадь_День4_SufleurPro.pdf'},
+      {n:5,title:'Auphonic — обработка звука',titleKz:'Auphonic — дыбыс өңдеу',sub:'Чистый звук ролика',subKz:'Роликтің таза дыбысы',date:'26 июня',dateKz:'26 маусым',wd:'пт',wdKz:'жм',cat:'content',tool:'Auphonic',toolKz:'Auphonic',q:6,pdf:'Тетрадь_День5_Auphonic.pdf'},
+      {n:6,title:'ChatGPT',titleKz:'ChatGPT',sub:'ИИ-помощник учителя',subKz:'Мұғалімнің ЖИ-көмекшісі',date:'27 июня',dateKz:'27 маусым',wd:'сб',wdKz:'сб',cat:'ai',tool:'ChatGPT',toolKz:'ChatGPT',q:6,pdf:'Тетрадь_День6_ChatGPT.pdf'},
+      {n:7,title:'Claude AI',titleKz:'Claude AI',sub:'Работа с большими текстами',subKz:'Үлкен мәтіндермен жұмыс',date:'29 июня',dateKz:'29 маусым',wd:'пн',wdKz:'дс',cat:'ai',tool:'Claude',toolKz:'Claude',q:6,pdf:'Тетрадь_День7_Claude.pdf'},
+      {n:8,title:'Gemini + Итоговое задание',titleKz:'Gemini + Қорытынды тапсырма',sub:'ИИ Google и защита проекта',subKz:'Google ЖИ және жобаны қорғау',date:'30 июня',dateKz:'30 маусым',wd:'вт',wdKz:'сс',cat:'ai',tool:'Gemini',toolKz:'Gemini',q:6,pdf:'Тетрадь_День8_Gemini_Защита.pdf'}
+    ];
+    const DRAG = '<span class="drag"><svg width="10" height="16" viewBox="0 0 10 16" fill="#c2cadb"><circle cx="2" cy="3" r="1.4"/><circle cx="8" cy="3" r="1.4"/><circle cx="2" cy="8" r="1.4"/><circle cx="8" cy="8" r="1.4"/><circle cx="2" cy="13" r="1.4"/><circle cx="8" cy="13" r="1.4"/></svg></span>';
+    function lessonItem(bg, stroke, ico, title, meta, body){
+      return '<div class="litem">'
+        + '<div class="lesson" onclick="this.parentNode.classList.toggle(\'open\')">'
+        + '<div class="lico" style="background:'+bg+'"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="'+stroke+'" stroke-width="2.1">'+ico+'</svg></div>'
+        + '<div style="flex:1;min-width:0"><div class="ltitle">'+title+'</div><div class="lmeta">'+meta+'</div></div>'
+        + '<svg class="lchev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b5bed4" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></div>'
+        + '<div class="lbody">'+body+'</div></div>';
+    }
+    function buildDayQuestions(n){
+      const d = (window.DAYS_TESTS || []).find(x => x.id === n);
+      if (!d) return '<div class="lmeta">Вопросы не найдены</div>';
+      const tl = LANG === 'kz' ? 'kk' : 'ru';
+      const check = '<svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>';
+      return d.questions.map((q,qi) => {
+        const opts = q.options.map((o,oi) => { const ok = oi === q.correct;
+          return '<div class="opt'+(ok?' ok':'')+'"><span class="letter">'+String.fromCharCode(65+oi)+'</span>'+o[tl]+(ok?check:'')+'</div>'; }).join('');
+        return '<div class="qday"><div class="qtext"><span class="qnum">'+(qi+1)+'</span>'+q.q[tl]+'</div><div class="opts">'+opts+'</div></div>';
+      }).join('');
+    }
+    function renderModules(){
+      const kz = LANG === 'kz';
+      const lang = kz ? 'kz' : 'ru';
+      const icoVid = '<polygon points="5 3 19 12 5 21 5 3"/>';
+      const icoPdf = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>';
+      const icoTest = '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>';
+      document.getElementById('modules').innerHTML = DAYS_FULL.map((d,i) => {
+        const title = kz ? d.titleKz : d.title;
+        const tool = kz ? d.toolKz : d.tool;
+        const sub = kz ? d.subKz : d.sub;
+        const dayLabel = kz ? (d.n+'-күн') : ('День '+d.n);
+        const meta = (kz ? d.dateKz : d.date) + ' · ' + (kz ? d.wdKz : d.wd);
+        const cat = CATS[d.cat];
+        const catLabel = kz ? cat.kz : cat.ru;
+        const passed = isDayOpen(d.n);
+        const statusLabel = passed ? (kz?'Өтілді':'Пройден') : (kz?'Басталмаған':'Не начат');
+        const statusStyle = passed ? 'background:#dcfce7;color:#15803d' : 'background:#eef1f7;color:#64708c';
+        const pdf = 'lessons/' + lang + '-' + d.n + '.pdf';
+        const wbBody = '<iframe class="pdfframe" src="'+pdf+'"></iframe>'
+          + '<div><a class="lbtn" href="'+pdf+'" target="_blank">'+(kz?'Жаңа бетте ашу':'Открыть в новой вкладке')+'</a></div>';
+        const vidBody = '<div class="vidrow">'
+          + '<input type="url" id="vidurl-'+d.n+'" placeholder="'+(kz?'Бейне сілтемесі (YouTube немесе mp4)':'Ссылка на видео (YouTube или mp4)')+'">'
+          + '<button class="lbtn" onclick="showVideoUrl('+d.n+')">'+(kz?'Сілтеме бойынша көрсету':'Показать по ссылке')+'</button>'
+          + '<label class="lbtn ghost">'+(kz?'Бейне жүктеу':'Загрузить видео')+'<input type="file" accept="video/*" hidden onchange="showVideoFile(event,'+d.n+')"></label>'
+          + '</div><div class="vidplayer" id="vidplayer-'+d.n+'"></div>';
+        const testBody = buildDayQuestions(d.n);
+        return '<div class="module'+(i===0?' open':'')+'" style="border-left:4px solid '+cat.bar+'">'
+        + '<div class="mhead" onclick="this.parentNode.classList.toggle(\'open\')">'+DRAG
+        + '<span class="mnum">'+d.n+'</span>'
+        + '<div class="mtitle">'
+          + '<div class="mday">'+dayLabel+' · '+meta+'</div>'
+          + '<div class="mt">'+title+'</div>'
+          + '<div class="msub">'+sub+'</div>'
+          + '<div class="mtags"><span class="catbadge" style="background:'+cat.bg+';color:'+cat.fg+'">'+catLabel+'</span><span>· '+tool+'</span></div>'
+        + '</div>'
+        + '<div class="mright"><button class="toggle'+(passed?' on':'')+'" title="'+(kz?'Күнді ашу/жабу':'Открыть/закрыть день')+'" onclick="event.stopPropagation();toggleDay('+d.n+')"><span></span></button>'
+        + '<span class="mstatus" style="'+statusStyle+'">'+statusLabel+'</span>'
+        + '<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9aa3ba" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></div></div>'
+        + '<div class="mbody">'
+        + lessonItem('#fdf0d6','#b07c10',icoPdf, kz?'Жұмыс дәптері':'Рабочая тетрадь', 'PDF · '+d.pdf, wbBody)
+        + lessonItem('#fee2e2','#c4485a',icoVid, (kz?'Бейнесабақ: ':'Видеоурок: ')+tool, kz?'Бейне':'Видео', vidBody)
+        + lessonItem('#dcfce7','#15803d',icoTest, 'Тест: '+tool, kz?('Тест · '+d.q+' сұрақ'):('Тест · '+d.q+' вопросов'), testBody)
+        + '<div class="addbtns"><button>'+(kz?'+ Бейне':'+ Видео')+'</button><button>+ PDF / '+(kz?'файл':'файл')+'</button><button>'+(kz?'+ Мәтін':'+ Текст')+'</button><button>+ Тест</button></div>'
+        + '</div></div>';
+      }).join('');
+    }
+    function showVideoUrl(n){
+      const url = (document.getElementById('vidurl-'+n).value || '').trim();
+      if (!url) return;
+      const host = document.getElementById('vidplayer-'+n);
+      const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]+)/);
+      if (yt) host.innerHTML = '<iframe src="https://www.youtube.com/embed/'+yt[1]+'" allowfullscreen></iframe>';
+      else host.innerHTML = '<video src="'+url+'" controls></video>';
+    }
+    function showVideoFile(e, n){
+      const f = e.target.files[0]; if (!f) return;
+      document.getElementById('vidplayer-'+n).innerHTML = '<video src="'+URL.createObjectURL(f)+'" controls></video>';
+    }
+    function goToCourse(){
+      document.querySelectorAll('.side .nav').forEach(n => n.classList.remove('on'));
+      document.querySelectorAll('.side .nav')[1].classList.add('on');
+      openCourse();
+    }
+    function openCourse(){
+      document.getElementById('view-dash').hidden = true;
+      document.getElementById('view-courses').hidden = true;
+      document.getElementById('view-students').hidden = true;
+      document.getElementById('view-reports').hidden = true;
+      document.getElementById('view-analytics').hidden = true;
+      document.getElementById('view-settings').hidden = true;
+      document.getElementById('view-leads').hidden = true;
+      document.getElementById('view-course').hidden = false;
+      renderModules();
+    }
+    function backToCourses(){
+      document.getElementById('view-course').hidden = true;
+      document.querySelectorAll('.side .nav')[1].click();
+    }
+    function courseTab(el){
+      el.parentNode.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+      el.classList.add('on');
+      const t = el.dataset.tab;
+      document.getElementById('ct-content').hidden = t !== 'content';
+      document.getElementById('ct-tests').hidden = t !== 'tests';
+      document.getElementById('ct-students').hidden = t !== 'students';
+      document.getElementById('ct-other').hidden = t !== 'settings';
+      if (t === 'tests') renderTestsTable();
+      if (t === 'students') renderStudents();
+    }
+
+    let groupFilter = 0;
+    function filterGroup(el){
+      const g = el.dataset.g;
+      document.querySelectorAll('.gchip').forEach(c => c.classList.toggle('on', c.dataset.g === g));
+      groupFilter = parseInt(g, 10);
+      renderStudents();
+    }
+    const SCORE_POOL = [100, 88, 92, 77, 95, 83, 100, 71, 88, 65, 90, 100, 80, 88, 77, 95, 92, 84, 100, 73];
+    function scoreFor(i, day){ return SCORE_POOL[(i * 4 + day) % SCORE_POOL.length]; }
+    const TOTAL_DAYS = 8;
+    let OPEN_DAYS = (function(){ try { const r = localStorage.getItem('ba_opendays'); if (r) return new Set(JSON.parse(r)); } catch(e){} return new Set([1,2,3,4,5,6,7,8]); })();
+    function isDayOpen(n){ return OPEN_DAYS.has(n); }
+    function openCount(){ return OPEN_DAYS.size; }
+    function saveOpenDays(){ try { localStorage.setItem('ba_opendays', JSON.stringify([...OPEN_DAYS])); } catch(e){} }
+    function toggleDay(n){ if (OPEN_DAYS.has(n)) OPEN_DAYS.delete(n); else OPEN_DAYS.add(n); saveOpenDays(); refreshAll(); }
+    function refreshAll(){
+      renderModules(); renderDashStats(); renderStudents(); renderTestsTable();
+      if (!document.getElementById('view-analytics').hidden) renderAnalytics();
+      const rd = document.getElementById('report-detail');
+      if (rd && !rd.hidden) renderReport(selectedReport);
+    }
+    function avgFor(i){ let sum = 0, cnt = 0; for (let d = 1; d <= TOTAL_DAYS; d++){ if (isDayOpen(d)){ sum += scoreFor(i, d-1); cnt++; } } return cnt ? Math.round(sum / cnt) : 0; }
+    function initials(fio){ const p = fio.split(' '); return ((p[0]||'')[0] + ((p[1]||'')[0] || '')).toUpperCase(); }
+    function renderStudents(){
+      if (!window.STUDENTS) return;
+      const kz = LANG === 'kz';
+      const list = window.STUDENTS.filter(s => groupFilter === 0 || s.g === groupFilter);
+      document.querySelectorAll('[data-scount]').forEach(el => el.textContent = list.length);
+      const html = list.map((s) => {
+        const i = window.STUDENTS.indexOf(s);
+        const avg = avgFor(i);
+        const grp = (kz ? (s.g+'-топ') : ('Группа '+s.g));
+        const passed = openCount();
+        const prog = Math.round(passed / TOTAL_DAYS * 100);
+        const progLabel = kz ? (TOTAL_DAYS+' күннің '+passed+'-і') : (passed+' из '+TOTAL_DAYS+' дней');
+        return '<div class="sgrid srow">'
+          + '<div class="sname"><span class="nm">'+s.fio+'</span></div>'
+          + '<span class="sgrp">'+grp+'</span>'
+          + '<div class="progwrap"><div class="prog"><span style="width:'+prog+'%"></span></div><span class="proglbl">'+progLabel+'</span></div>'
+          + '<span class="avg">'+avg+'%</span></div>';
+      }).join('');
+      document.querySelectorAll('[data-srows]').forEach(el => el.innerHTML = html);
+    }
+    const SET_DEFAULTS = { firstName:'Бекмурат', lastName:'Оналбай', email:'bekmurat@bilimall.kz', phone:'+7 778 965 87 40', org:'ЮКПУ им. О. Жанибекова', role:'Суперадмин · Ведущий курса', password:'1234', notif:{ email:true, weekly:true, newStudents:false }, twofa:false };
+    let SETTINGS = null;
+    function loadSettings(){ try { const r = localStorage.getItem('ba_settings'); const base = JSON.parse(JSON.stringify(SET_DEFAULTS)); if (r){ const p = JSON.parse(r); Object.assign(base, p); base.notif = Object.assign({}, SET_DEFAULTS.notif, p.notif||{}); } return base; } catch(e){ return JSON.parse(JSON.stringify(SET_DEFAULTS)); } }
+    function saveSettings(){ try { localStorage.setItem('ba_settings', JSON.stringify(SETTINGS)); } catch(e){} }
+    function setMsg(id, text, ok){ const el = document.getElementById(id); el.textContent = text; el.className = 'smsg ' + (ok ? 'ok' : 'err'); }
+    function renderSettings(){
+      SETTINGS = loadSettings();
+      const kz = LANG === 'kz';
+      document.getElementById('set-first').value = SETTINGS.firstName;
+      document.getElementById('set-last').value = SETTINGS.lastName;
+      document.getElementById('set-email').value = SETTINGS.email;
+      document.getElementById('set-phone').value = SETTINGS.phone;
+      document.getElementById('set-org').value = SETTINGS.org;
+      document.getElementById('set-role').value = kz ? 'Суперәкімші · Курс жетекшісі' : SETTINGS.role;
+      document.getElementById('msg-profile').textContent = '';
+      document.getElementById('msg-pw').textContent = '';
+      ['set-pw-cur','set-pw-new','set-pw-rep'].forEach(id => document.getElementById(id).value = '');
+      document.querySelectorAll('.toggle[data-nk]').forEach(t => t.classList.toggle('on', !!SETTINGS.notif[t.dataset.nk]));
+      document.getElementById('tg-twofa').classList.toggle('on', !!SETTINGS.twofa);
+      document.getElementById('set-lang-ru').classList.toggle('on', LANG === 'ru');
+      document.getElementById('set-lang-kz').classList.toggle('on', LANG === 'kz');
+      document.getElementById('msg-acc').textContent = '';
+      renderAccounts();
+    }
+    function saveProfile(){
+      const kz = LANG === 'kz';
+      const first = document.getElementById('set-first').value.trim();
+      const last = document.getElementById('set-last').value.trim();
+      const email = document.getElementById('set-email').value.trim();
+      if (!first || !last){ setMsg('msg-profile', kz?'Аты мен тегін толтырыңыз':'Заполните имя и фамилию', false); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setMsg('msg-profile', kz?'Email қате':'Неверный формат email', false); return; }
+      SETTINGS.firstName = first; SETTINGS.lastName = last; SETTINGS.email = email;
+      SETTINGS.phone = document.getElementById('set-phone').value.trim();
+      SETTINGS.org = document.getElementById('set-org').value.trim();
+      saveSettings();
+      setMsg('msg-profile', kz?'Сақталды ✓':'Сохранено ✓', true);
+    }
+    function changePassword(){
+      const kz = LANG === 'kz';
+      const cur = document.getElementById('set-pw-cur').value;
+      const nw = document.getElementById('set-pw-new').value;
+      const rep = document.getElementById('set-pw-rep').value;
+      if (cur !== SETTINGS.password){ setMsg('msg-pw', kz?'Ағымдағы құпиясөз қате':'Текущий пароль неверный', false); return; }
+      if (nw.length < 6){ setMsg('msg-pw', kz?'Жаңа құпиясөз кемінде 6 таңба':'Новый пароль — минимум 6 символов', false); return; }
+      if (nw !== rep){ setMsg('msg-pw', kz?'Құпиясөздер сәйкес келмейді':'Пароли не совпадают', false); return; }
+      SETTINGS.password = nw; saveSettings();
+      ['set-pw-cur','set-pw-new','set-pw-rep'].forEach(id => document.getElementById(id).value = '');
+      setMsg('msg-pw', kz?'Құпиясөз ауыстырылды ✓':'Пароль изменён ✓', true);
+    }
+    function toggleNotif(k){ SETTINGS.notif[k] = !SETTINGS.notif[k]; saveSettings(); document.querySelector('.toggle[data-nk="'+k+'"]').classList.toggle('on', SETTINGS.notif[k]); }
+    function toggleTwofa(){ SETTINGS.twofa = !SETTINGS.twofa; saveSettings(); document.getElementById('tg-twofa').classList.toggle('on', SETTINGS.twofa); }
+    function accountLogout(){ alert(LANG==='kz'?'Аккаунттан шығу (демо)':'Выход из аккаунта (демо)'); }
+
+    const ROLES = {
+      super: { ru:'Суперадмин', kz:'Суперәкімші', bg:'#ede9fe', fg:'#6d28d9' },
+      admin: { ru:'Администратор', kz:'Әкімші', bg:'#e6f1fb', fg:'#185fa5' },
+      lead:  { ru:'Ведущий курсов', kz:'Курс жетекшісі', bg:'#dcfce7', fg:'#15803d' }
+    };
+    const ACCOUNTS_DEFAULT = [
+      { id:1, name:'Бекмурат Оналбай', email:'bekmurat@bilimall.kz', role:'super', lead:true },
+      { id:2, name:'Айгерим Сатпаева', email:'aigerim@bilimall.kz', role:'admin' },
+      { id:3, name:'Данияр Оспанов', email:'daniyar@bilimall.kz', role:'lead' }
+    ];
+    function loadAccounts(){ try { const r = localStorage.getItem('ba_accounts'); return r ? JSON.parse(r) : JSON.parse(JSON.stringify(ACCOUNTS_DEFAULT)); } catch(e){ return JSON.parse(JSON.stringify(ACCOUNTS_DEFAULT)); } }
+    function saveAccounts(a){ try { localStorage.setItem('ba_accounts', JSON.stringify(a)); } catch(e){} }
+    function renderAccounts(){
+      const kz = LANG === 'kz';
+      const accs = loadAccounts();
+      document.getElementById('accounts-list').innerHTML = accs.map(a => {
+        const r = ROLES[a.role]; const isSuper = a.role === 'super';
+        const roleCtl = isSuper
+          ? '<span class="rolebadge" style="background:'+r.bg+';color:'+r.fg+'">'+(kz?r.kz:r.ru)+'</span>'
+          : '<select onchange="changeRole('+a.id+',this.value)">' + ['admin','lead'].map(k => '<option value="'+k+'"'+(k===a.role?' selected':'')+'>'+(kz?ROLES[k].kz:ROLES[k].ru)+'</option>').join('') + '</select>';
+        const del = isSuper ? '' : '<button class="accdel" onclick="removeAccount('+a.id+')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
+        return '<div class="acc"><span class="accav">'+initials(a.name)+'</span><div class="ai"><div class="an">'+a.name+'</div><div class="ae">'+a.email+'</div></div>'+roleCtl+del+'</div>';
+      }).join('');
+    }
+    function createAccount(){
+      const kz = LANG === 'kz';
+      const name = document.getElementById('acc-name').value.trim();
+      const email = document.getElementById('acc-email').value.trim();
+      const role = document.getElementById('acc-role').value;
+      if (!name){ setMsg('msg-acc', kz?'Қызметкердің атын енгізіңіз':'Введите имя сотрудника', false); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ setMsg('msg-acc', kz?'Email қате':'Неверный формат email', false); return; }
+      const accs = loadAccounts();
+      if (accs.some(a => a.email.toLowerCase() === email.toLowerCase())){ setMsg('msg-acc', kz?'Мұндай email бар':'Аккаунт с таким email уже есть', false); return; }
+      accs.push({ id: Date.now(), name, email, role });
+      saveAccounts(accs);
+      document.getElementById('acc-name').value = ''; document.getElementById('acc-email').value = '';
+      renderAccounts();
+      setMsg('msg-acc', kz?'Аккаунт құрылды ✓':'Аккаунт создан ✓', true);
+    }
+    function changeRole(id, role){ const accs = loadAccounts(); const a = accs.find(x => x.id === id); if (a){ a.role = role; saveAccounts(accs); renderAccounts(); } }
+    function renderLeads(){
+      const kz = LANG === 'kz';
+      const leads = loadAccounts().filter(a => a.role === 'lead' || a.lead);
+      const courseName = LANG === 'kz' ? 'ЖИ оқытушы жұмысында' : 'ИИ в работе преподавателя';
+      document.getElementById('leads-list').innerHTML = leads.map(a => {
+        const r = ROLES[a.role];
+        return '<div class="ccard" style="align-items:flex-start;gap:13px">'
+          + '<span class="accav" style="width:44px;height:44px;font-size:14px">'+initials(a.name)+'</span>'
+          + '<div style="flex:1;min-width:0"><div class="ctitle" style="font-size:15.5px">'+a.name+'</div>'
+          + '<div class="cmeta">'+a.email+'</div>'
+          + '<div style="margin-top:9px;display:flex;gap:7px;flex-wrap:wrap;align-items:center"><span class="rolebadge" style="background:'+r.bg+';color:'+r.fg+'">'+(kz?r.kz:r.ru)+'</span><span style="font-size:11.5px;color:#8a93ad">· '+(kz?'Жүргізеді: ':'Ведёт: ')+courseName+'</span></div></div>'
+          + '</div>';
+      }).join('');
+    }
+    function removeAccount(id){
+      const kz = LANG === 'kz';
+      if (!confirm(kz?'Қызметкердің аккаунтын жою керек пе?':'Удалить аккаунт сотрудника?')) return;
+      saveAccounts(loadAccounts().filter(x => x.id !== id));
+      renderAccounts();
+    }
+
+    let charts = {};
+    function renderAnalytics(){
+      if (!window.STUDENTS || typeof Chart === 'undefined') return;
+      const kz = LANG === 'kz';
+      const N = window.STUDENTS.length, D = openCount(), total = DAYS_FULL.length;
+      const dayAvgs = [], dayColors = [];
+      let openSum = 0, openN = 0;
+      for (let d = 0; d < total; d++){
+        if (isDayOpen(d+1)){ let s = 0; for (let i = 0; i < N; i++) s += scoreFor(i,d); const avg = Math.round(s/N); dayAvgs.push(avg); dayColors.push('#e8a317'); openSum += avg; openN++; }
+        else { dayAvgs.push(0); dayColors.push('#e3e8f3'); }
+      }
+      const overallAvg = openN ? Math.round(openSum / openN) : 0;
+      const groups = [1,2,3,4].map(g => window.STUDENTS.filter(s => s.g === g).length);
+      const passedByDay = [];
+      for (let d = 1; d <= total; d++) passedByDay.push(isDayOpen(d) ? N : null);
+      const bins = [0,0,0,0];
+      for (let i = 0; i < N; i++) for (let d = 0; d < total; d++){ if (!isDayOpen(d+1)) continue; const v = scoreFor(i,d); if (v < 70) bins[0]++; else if (v < 80) bins[1]++; else if (v < 90) bins[2]++; else bins[3]++; }
+      const passPct = Math.round(window.STUDENTS.filter((s,i) => avgFor(i) >= 60).length / N * 100);
+
+      document.getElementById('an-students').textContent = N;
+      document.getElementById('an-avg').textContent = overallAvg + '%';
+      document.getElementById('an-days').textContent = D + (kz ? (' / ' + total) : (' из ' + total));
+      document.getElementById('an-pass').textContent = passPct + '%';
+
+      Object.values(charts).forEach(c => c && c.destroy());
+      const navy = '#1f2d52', gold = '#e8a317';
+      const dayLabels = []; for (let d = 1; d <= total; d++) dayLabels.push(kz ? (d + '-к') : ('Д' + d));
+      Chart.defaults.font.family = 'Inter, sans-serif';
+      Chart.defaults.color = '#64708c';
+      const noLegend = { plugins: { legend: { display: false } }, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#eef1f7' } }, x: { grid: { display: false } } } };
+
+      charts.days = new Chart(document.getElementById('ch-days'), {
+        type: 'bar',
+        data: { labels: dayLabels, datasets: [{ data: dayAvgs, backgroundColor: dayColors, borderRadius: 8, maxBarThickness: 54 }] },
+        options: Object.assign({}, noLegend, { scales: { y: { beginAtZero: true, max: 100, grid: { color: '#eef1f7' }, ticks: { callback: v => v + '%' } }, x: { grid: { display: false } } } })
+      });
+      charts.groups = new Chart(document.getElementById('ch-groups'), {
+        type: 'doughnut',
+        data: { labels: ['1-топ','2-топ','3-топ','4-топ'], datasets: [{ data: groups, backgroundColor: ['#3b82f6','#0ea5e9','#8b5cf6','#14b8a6'], borderWidth: 0 }] },
+        options: { maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } } } }
+      });
+      charts.progress = new Chart(document.getElementById('ch-progress'), {
+        type: 'line',
+        data: { labels: dayLabels, datasets: [{ data: passedByDay, borderColor: navy, backgroundColor: 'rgba(31,45,82,.08)', fill: true, tension: .35, pointBackgroundColor: navy, pointRadius: 4 }] },
+        options: Object.assign({}, noLegend, { scales: { y: { beginAtZero: true, suggestedMax: N, grid: { color: '#eef1f7' } }, x: { grid: { display: false } } } })
+      });
+      charts.dist = new Chart(document.getElementById('ch-dist'), {
+        type: 'bar',
+        data: { labels: ['60–69%','70–79%','80–89%','90–100%'], datasets: [{ data: bins, backgroundColor: ['#c4485a','#e8a317','#22a85a','#15803d'], borderRadius: 8, maxBarThickness: 54 }] },
+        options: noLegend
+      });
+    }
+
+    const REPORT_COURSES = [
+      { id:'ai', titleRu:'ИИ в работе преподавателя', titleKz:'ЖИ оқытушы жұмысында', days:8, active:true }
+    ];
+    let selectedReport = 'ai';
+    function scoreColor(v){ return v >= 80 ? '#15803d' : (v >= 60 ? '#a16207' : '#c4485a'); }
+    function renderReportCourses(){
+      const kz = LANG === 'kz';
+      const active = REPORT_COURSES.filter(c => c.active);
+      document.getElementById('report-courses').innerHTML = active.map(c => {
+        return '<div class="ccard rcourse" onclick="openReport(\''+c.id+'\')">'
+          + '<div><div class="ctitle">'+(kz?c.titleKz:c.titleRu)+'</div><div class="cmeta">'+(kz?(c.days+' күн · Белсенді'):(c.days+' дней · Активен'))+'</div></div>'
+          + '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b5bed4" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></div>';
+      }).join('');
+      if (!document.getElementById('report-detail').hidden) renderReport(selectedReport);
+    }
+    function openReport(id){
+      selectedReport = id;
+      document.getElementById('report-list').hidden = true;
+      document.getElementById('report-detail').hidden = false;
+      renderReport(id);
+    }
+    function backToReports(){
+      document.getElementById('report-detail').hidden = true;
+      document.getElementById('report-list').hidden = false;
+    }
+    function reportMetric(label, value){
+      return '<div class="metric"><div class="top">'+label+'</div><div class="num" style="font-size:28px">'+value+'</div></div>';
+    }
+    function renderReport(id){
+      const kz = LANG === 'kz';
+      const c = REPORT_COURSES.find(x => x.id === id);
+      const host = document.getElementById('report-body');
+      const cname = kz ? c.titleKz : c.titleRu;
+      document.getElementById('report-title').textContent = cname;
+      document.getElementById('report-cname').textContent = cname;
+      const TOTAL = c.days, D = openCount(), N = window.STUDENTS.length;
+      let courseSum = 0;
+      const rows = window.STUDENTS.map((s,i) => {
+        let ssum = 0, cnt = 0; const ds = [];
+        for (let d = 0; d < TOTAL; d++){ if (isDayOpen(d+1)){ const v = scoreFor(i,d); ds.push(v); ssum += v; cnt++; } else ds.push(null); }
+        const overall = cnt ? Math.round(ssum / cnt) : 0; courseSum += overall;
+        return { s, ds, overall };
+      });
+      const courseAvg = Math.round(courseSum / N);
+      const cols = '2fr .8fr repeat('+TOTAL+', minmax(0,.62fr)) .8fr';
+      let head = '<span data-ru="УЧЕНИК" data-kz="ОҚУШЫ">'+(kz?'ОҚУШЫ':'УЧЕНИК')+'</span><span data-ru="ГРУППА" data-kz="ТОБЫ">'+(kz?'ТОБЫ':'ГРУППА')+'</span>';
+      for (let d = 1; d <= TOTAL; d++) head += '<span style="text-align:center;color:'+(isDayOpen(d)?'#8a93ad':'#c2cadb')+'">'+(kz?(d+'-к'):('Д'+d))+'</span>';
+      head += '<span style="text-align:center">'+(kz?'ҚОРЫТ.':'ИТОГ')+'</span>';
+      const body = rows.map(r => {
+        let cells = '<span style="font-weight:600">'+r.s.fio+'</span><span class="sgrp">'+(kz?(r.s.g+'-топ'):('Группа '+r.s.g))+'</span>';
+        r.ds.forEach(v => { cells += (v === null)
+          ? '<span class="rscore" style="color:#c2cadb">—</span>'
+          : '<span class="rscore" style="color:'+scoreColor(v)+'">'+v+'%</span>'; });
+        cells += '<span class="rtot" style="color:'+scoreColor(r.overall)+'">'+r.overall+'%</span>';
+        return '<div class="rgrid rrow" style="grid-template-columns:'+cols+'">'+cells+'</div>';
+      }).join('');
+      const mStud = '<span data-ru="Учеников" data-kz="Оқушылар">'+(kz?'Оқушылар':'Учеников')+'</span>';
+      const mDays = '<span data-ru="Дней пройдено" data-kz="Өткен күндер">'+(kz?'Өткен күндер':'Дней пройдено')+'</span>';
+      const mAvg = '<span data-ru="Средняя оценка" data-kz="Орташа баға">'+(kz?'Орташа баға':'Средняя оценка')+'</span>';
+      host.innerHTML =
+        '<div class="rmetrics">'
+        + reportMetric(mStud, N)
+        + reportMetric(mDays, D + (kz?(' / '+c.days):(' из '+c.days)))
+        + reportMetric(mAvg, courseAvg + '%')
+        + '</div>'
+        + '<div class="stable">'
+        + '<div class="listhead"><div class="lt">'+(kz?'Есеп — ':'Отчёт — ')+(kz?c.titleKz:c.titleRu)+'</div><div style="display:flex;gap:16px"><div class="csv" onclick="exportReportXlsx()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Excel</div><div class="csv" onclick="exportReportPdf()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>PDF</div></div></div>'
+        + '<div class="rgrid sthead" style="grid-template-columns:'+cols+'">'+head+'</div>'
+        + body
+        + '</div>';
+    }
+    function reportRows(){
+      const c = REPORT_COURSES.find(x => x.id === selectedReport);
+      const TOTAL = c.days;
+      const header = ['ФИО', 'Группа'];
+      for (let d = 1; d <= TOTAL; d++) header.push('День ' + d);
+      header.push('Итог, %');
+      const rows = [header];
+      window.STUDENTS.forEach((s,i) => {
+        const row = [s.fio, s.g + '-топ']; let ssum = 0, cnt = 0;
+        for (let d = 0; d < TOTAL; d++){ if (isDayOpen(d+1)){ const v = scoreFor(i,d); row.push(v); ssum += v; cnt++; } else row.push(''); }
+        row.push(cnt ? Math.round(ssum / cnt) : 0);
+        rows.push(row);
+      });
+      return rows;
+    }
+    function exportReportXlsx(){
+      const c = REPORT_COURSES.find(x => x.id === selectedReport);
+      const rows = reportRows();
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = [{wch:34},{wch:10}].concat(Array.from({length: rows[0].length - 2}, () => ({wch:9})));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Отчёт');
+      XLSX.writeFile(wb, 'bilimall_отчёт_' + selectedReport + '.xlsx');
+    }
+    function exportReportPdf(){
+      const kz = LANG === 'kz';
+      const c = REPORT_COURSES.find(x => x.id === selectedReport);
+      const rows = reportRows();
+      const head = '<tr>' + rows[0].map(h => '<th>' + h + '</th>').join('') + '</tr>';
+      const body = rows.slice(1).map(r => '<tr>' + r.map((cell,ci) => '<td'+(ci===0?' class="l"':'')+(ci===r.length-1?' class="b"':'')+'>' + cell + '</td>').join('') + '</tr>').join('');
+      const title = (kz ? c.titleKz : c.titleRu);
+      const sub = (kz ? ('Оқушылар: '+window.STUDENTS.length+' · Өткен күндер: '+openCount()+' / '+c.days) : ('Учеников: '+window.STUDENTS.length+' · Дней пройдено: '+openCount()+' из '+c.days));
+      const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+title+'</title><style>'
+        + 'body{font-family:Arial,sans-serif;color:#1f2d52;padding:24px;margin:0}'
+        + 'h1{font-size:18px;margin:0 0 4px}.sub{font-size:12px;color:#64708c;margin-bottom:16px}'
+        + 'table{width:100%;border-collapse:collapse;font-size:10.5px}'
+        + 'th,td{border:1px solid #cbd5e6;padding:5px 7px;text-align:center}'
+        + 'th{background:#1f2d52;color:#fff;font-size:10px}'
+        + 'td.l{text-align:left}td.b{font-weight:bold}'
+        + 'tr:nth-child(even) td{background:#f6f8fc}'
+        + '@media print{@page{margin:14mm}}'
+        + '</style></head><body><h1>'+(kz?'Есеп — ':'Отчёт — ')+title+'</h1><div class="sub">'+sub+'</div>'
+        + '<table><thead>'+head+'</thead><tbody>'+body+'</tbody></table>'
+        + '<script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script></body></html>';
+      const w = window.open('', '_blank');
+      if (!w){ alert(kz?'Браузер жаңа терезені бөгеді':'Браузер заблокировал новое окно — разрешите всплывающие окна'); return; }
+      w.document.write(html); w.document.close();
+    }
+    function exportStudentsCsv(){
+      const rows = [['ФИО','Группа','Телефон','День 1','День 2','День 3','День 4','Средний']];
+      window.STUDENTS.forEach((s,i) => rows.push([s.fio, s.g+'-топ', s.p, scoreFor(i,0)+'%', scoreFor(i,1)+'%', scoreFor(i,2)+'%', scoreFor(i,3)+'%', avgFor(i)+'%']));
+      const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const blob = new Blob(['﻿'+csv], {type:'text/csv'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'bilimall_ученики.csv'; a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    const PASS_MARK = 60;
+    function dayAvg(dayN){
+      if (!window.STUDENTS || !isDayOpen(dayN)) return null;
+      const N = window.STUDENTS.length;
+      let sum = 0;
+      for (let i = 0; i < N; i++) sum += scoreFor(i, dayN - 1);
+      return Math.round(sum / N);
+    }
+    function renderTestsTable(){
+      const kz = LANG === 'kz';
+      document.getElementById('tests').innerHTML = DAYS_FULL.map((d) => {
+        const name = kz ? d.titleKz : d.title;
+        const bound = kz ? (d.n + '-күн') : ('День ' + d.n);
+        const avg = dayAvg(d.n);
+        const avgTxt = avg === null ? '—' : (avg + '%');
+        const avgCol = avg === null ? '#8a93ad' : (avg >= PASS_MARK ? '#15803d' : '#c4485a');
+        return '<div class="tgrid trow">'
+          + '<span style="font-weight:600">' + name + '</span>'
+          + '<span class="sgrp">' + bound + '</span>'
+          + '<span>' + d.q + '</span>'
+          + '<span>' + PASS_MARK + '%</span>'
+          + '<span style="font-weight:800;color:' + avgCol + '">' + avgTxt + '</span></div>';
+      }).join('');
+    }
+
+    let periodFilter = '30';
+    const PERIOD_FRAC = { all: 1, '90': 1, '30': 0.92, '15': 0.70 };
+    function filterPeriod(el){
+      document.querySelectorAll('.pchip').forEach(c => c.classList.remove('on'));
+      el.classList.add('on');
+      periodFilter = el.dataset.p;
+      renderDashStats();
+    }
+    function renderDashStats(){
+      if (!window.STUDENTS) return;
+      const kz = LANG === 'kz';
+      const total = window.STUDENTS.length;
+      const days = DAYS_FULL.length;
+      const activeN = Math.round(total * (PERIOD_FRAC[periodFilter] || 1));
+      document.getElementById('m-students').textContent = activeN;
+      document.getElementById('m-students-sub').textContent = kz ? '4 топтан' : 'из 4 групп';
+      document.getElementById('m-total').textContent = total;
+      document.getElementById('m-total-sub').textContent = kz ? 'тіркелген' : 'записаны на курс';
+      document.getElementById('m-courses').textContent = 1;
+      document.getElementById('m-courses-sub').textContent = kz ? (days + ' күн курсы') : (days + ' дней в курсе');
+      let sum = 0;
+      for (let i = 0; i < activeN; i++) sum += avgFor(i);
+      document.getElementById('m-avg').textContent = (activeN ? Math.round(sum / activeN) : 0) + '%';
+      document.getElementById('m-avg-sub').textContent = kz ? (activeN + ' оқушы бойынша') : ('по ' + activeN + ' ученикам');
+      renderDashCourses();
+    }
+    function renderDashCourses(){
+      if (!window.STUDENTS) return;
+      const kz = LANG === 'kz';
+      document.getElementById('c-students').textContent = window.STUDENTS.length;
+      const oc = openCount();
+      const prog = Math.round(oc / TOTAL_DAYS * 100);
+      document.getElementById('c-prog').style.width = prog + '%';
+      document.getElementById('c-proglbl').textContent = (kz ? (TOTAL_DAYS + ' күннің ' + oc + '-і') : (oc + ' из ' + TOTAL_DAYS + ' дней')) + ' · ' + prog + '%';
+    }
+
+    applyI18n();
+    renderModules();
+    renderDashStats();
+  </script>
+</body>
+</html>
