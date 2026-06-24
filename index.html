@@ -1038,16 +1038,14 @@
     function reportRows(){
       const c = REPORT_COURSES.find(x => x.id === selectedReport);
       const TOTAL = c.days;
-      const openList = [];
-      for (let d = 1; d <= TOTAL; d++) if (isDayOpen(d)) openList.push(d);
       const header = ['ФИО', 'Группа'];
-      openList.forEach(d => header.push('День ' + d));
+      for (let d = 1; d <= TOTAL; d++) header.push('День ' + d);
       header.push('Итог, %');
       const rows = [header];
       window.STUDENTS.forEach((s,i) => {
-        const row = [s.fio, s.g + '-топ']; let ssum = 0;
-        openList.forEach(d => { const v = scoreFor(i, d-1); row.push(v); ssum += v; });
-        row.push(openList.length ? Math.round(ssum / openList.length) : 0);
+        const row = [s.fio, s.g + '-топ']; let ssum = 0, cnt = 0;
+        for (let d = 0; d < TOTAL; d++){ if (isDayOpen(d+1)){ const v = scoreFor(i,d); row.push(v); ssum += v; cnt++; } else row.push(''); }
+        row.push(cnt ? Math.round(ssum / cnt) : 0);
         rows.push(row);
       });
       return rows;
