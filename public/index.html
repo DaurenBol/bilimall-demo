@@ -589,6 +589,7 @@
       localStorage.removeItem('ba_login_fails');
       localStorage.removeItem('ba_login_lock');
       errEl.style.display = 'none';
+      if (a.role === 'super') SUPER_PASS_MEM = p;
       localStorage.setItem('ba_session_role', a.role);
       enterApp(a.role);
     }
@@ -601,8 +602,10 @@
       if (role === 'super'){ rb.textContent = kz ? 'СУПЕРӘКІМШІ' : 'СУПЕРАДМИН'; rb.style.cssText = 'background:rgba(216,178,74,.25);color:#f5c252'; }
       else { rb.textContent = kz ? 'БАҚЫЛАУШЫ' : 'ОБОЗРЕВАТЕЛЬ'; rb.style.cssText = 'background:rgba(255,255,255,.15);color:#cdd5e4'; }
       if (window.STUDENTS){ renderModules(); renderDashStats(); }
+      startDaysSync();
     }
     function logout(){
+      SUPER_PASS_MEM = '';
       localStorage.removeItem('ba_session_role');
       SESSION_ROLE = null;
       document.body.classList.remove('role-admin');
@@ -793,11 +796,36 @@
     const SCORE_POOL = [100, 88, 92, 77, 95, 83, 100, 71, 88, 65, 90, 100, 80, 88, 77, 95, 92, 84, 100, 73];
     function scoreFor(i, day){ return SCORE_POOL[(i * 4 + day) % SCORE_POOL.length]; }
     const TOTAL_DAYS = 8;
-    let OPEN_DAYS = (function(){ try { const r = localStorage.getItem('ba_opendays'); if (r) return new Set(JSON.parse(r)); } catch(e){} return new Set([1,2,3,4,5,6,7,8]); })();
+    let OPEN_DAYS = new Set([1,2,3,4,5,6,7,8]);
+    let SUPER_PASS_MEM = '';
     function isDayOpen(n){ return OPEN_DAYS.has(n); }
     function openCount(){ return OPEN_DAYS.size; }
-    function saveOpenDays(){ try { localStorage.setItem('ba_opendays', JSON.stringify([...OPEN_DAYS])); } catch(e){} }
-    function toggleDay(n){ if (OPEN_DAYS.has(n)) OPEN_DAYS.delete(n); else OPEN_DAYS.add(n); saveOpenDays(); refreshAll(); }
+    async function loadDaysFromServer(){
+      try {
+        const r = await fetch('/api/days', { cache: 'no-store' });
+        if (!r.ok) return;
+        const d = await r.json();
+        if (Array.isArray(d.openDays)){
+          const next = new Set(d.openDays);
+          const changed = next.size !== OPEN_DAYS.size || [...next].some(x => !OPEN_DAYS.has(x));
+          OPEN_DAYS = next;
+          if (changed) refreshAll();
+        }
+      } catch(e){}
+    }
+    async function toggleDay(n){
+      if (OPEN_DAYS.has(n)) OPEN_DAYS.delete(n); else OPEN_DAYS.add(n);
+      refreshAll();
+      try {
+        await fetch('/api/days', { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ openDays:[...OPEN_DAYS], pass: SUPER_PASS_MEM }) });
+      } catch(e){}
+    }
+    let daysPollTimer = null;
+    function startDaysSync(){
+      loadDaysFromServer();
+      if (!daysPollTimer) daysPollTimer = setInterval(loadDaysFromServer, 20000);
+    }
     function refreshAll(){
       renderModules(); renderDashStats(); renderStudents(); renderTestsTable();
       if (!document.getElementById('view-analytics').hidden) renderAnalytics();
