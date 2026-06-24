@@ -589,7 +589,7 @@
       localStorage.removeItem('ba_login_fails');
       localStorage.removeItem('ba_login_lock');
       errEl.style.display = 'none';
-      if (a.role === 'super') SUPER_PASS_MEM = p;
+      if (a.role === 'super'){ SUPER_PASS_MEM = p; try { sessionStorage.setItem('ba_sp', p); } catch(e){} }
       localStorage.setItem('ba_session_role', a.role);
       enterApp(a.role);
     }
@@ -606,6 +606,7 @@
     }
     function logout(){
       SUPER_PASS_MEM = '';
+      try { sessionStorage.removeItem('ba_sp'); } catch(e){}
       localStorage.removeItem('ba_session_role');
       SESSION_ROLE = null;
       document.body.classList.remove('role-admin');
@@ -1213,7 +1214,7 @@
     applyI18n();
     renderModules();
     renderDashStats();
-    (function(){ const s = localStorage.getItem('ba_session_role'); if (s === 'super' || s === 'admin') enterApp(s); })();
+    (function(){ const s = localStorage.getItem('ba_session_role'); if (s === 'super' || s === 'admin'){ if (s === 'super'){ try { SUPER_PASS_MEM = sessionStorage.getItem('ba_sp') || ''; } catch(e){} } enterApp(s); } })();
   </script>
 </body>
 </html>
