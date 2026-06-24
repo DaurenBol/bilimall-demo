@@ -307,12 +307,6 @@
 
       <div id="view-dash">
       <h1 data-ru="Дашборд" data-kz="Бақылау тақтасы">Дашборд</h1>
-      <div class="periodbar">
-        <button class="pchip" data-p="all" onclick="filterPeriod(this)" data-ru="За всё время" data-kz="Барлық уақыт">За всё время</button>
-        <button class="pchip on" data-p="30" onclick="filterPeriod(this)" data-ru="30 дней" data-kz="30 күн">30 дней</button>
-        <button class="pchip" data-p="90" onclick="filterPeriod(this)" data-ru="90 дней" data-kz="90 күн">90 дней</button>
-        <button class="pchip" data-p="15" onclick="filterPeriod(this)" data-ru="15 дней" data-kz="15 күн">15 дней</button>
-      </div>
 
       <div class="metrics">
         <div class="metric"><div class="top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span data-ru="Активные ученики" data-kz="Белсенді оқушылар">Активные ученики</span></div><div class="num" id="m-students">—</div><div class="delta" style="color:#64708c" id="m-students-sub"></div></div>
@@ -1177,7 +1171,7 @@
       const kz = LANG === 'kz';
       const total = window.STUDENTS.length;
       const days = DAYS_FULL.length;
-      const activeN = Math.round(total * (PERIOD_FRAC[periodFilter] || 1));
+      const activeN = total;
       document.getElementById('m-students').textContent = activeN;
       document.getElementById('m-students-sub').textContent = kz ? '4 топтан' : 'из 4 групп';
       document.getElementById('m-total').textContent = total;
