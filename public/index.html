@@ -735,7 +735,33 @@
         + lessonItem('#dcfce7','#15803d',icoTest, 'Тест: '+tool, kz?('Тест · '+d.q+' сұрақ'):('Тест · '+d.q+' вопросов'), testBody)
         + '<div class="addbtns"><button>'+(kz?'+ Бейне':'+ Видео')+'</button><button>+ PDF / '+(kz?'файл':'файл')+'</button><button>'+(kz?'+ Мәтін':'+ Текст')+'</button><button>+ Тест</button></div>'
         + '</div></div>';
-      }).join('');
+      }).join('') + buildFinalModule();
+    }
+    function buildFinalModule(){
+      const kz = LANG === 'kz';
+      const cat = CATS['ai'];
+      const title = kz ? FINAL.titleKz : FINAL.title;
+      const sub = kz ? FINAL.subKz : FINAL.sub;
+      const open = FINAL_OPEN;
+      const statusLabel = open ? (kz?'Қосулы':'Включён') : (kz?'Өшірулі':'Выключен');
+      const statusStyle = open ? 'background:#dcfce7;color:#15803d' : 'background:#eef1f7;color:#64708c';
+      const icoTest = '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>';
+      const testBody = buildDayQuestions(9);
+      return '<div class="module" style="border-left:4px solid '+cat.bar+'">'
+        + '<div class="mhead" onclick="this.parentNode.classList.toggle(\'open\')">'+DRAG
+        + '<span class="mnum" style="background:'+cat.bg+';color:'+cat.fg+'">★</span>'
+        + '<div class="mtitle">'
+          + '<div class="mday">'+(kz?'Қорытынды':'Финал')+' · '+(kz?'барлық 8 күн':'все 8 дней')+'</div>'
+          + '<div class="mt">'+title+'</div>'
+          + '<div class="msub">'+sub+'</div>'
+          + '<div class="mtags"><span class="catbadge" style="background:'+cat.bg+';color:'+cat.fg+'">'+(kz?'Қорытынды тест':'Финальный тест')+'</span><span>· 10 '+(kz?'сұрақ':'вопросов')+'</span></div>'
+        + '</div>'
+        + '<div class="mright"><button class="toggle'+(open?' on':'')+'" title="'+(kz?'Тестті қосу/өшіру':'Включить/выключить тест')+'" onclick="event.stopPropagation();toggleFinal()"><span></span></button>'
+        + '<span class="mstatus" style="'+statusStyle+'">'+statusLabel+'</span>'
+        + '<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9aa3ba" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></div></div>'
+        + '<div class="mbody">'
+        + lessonItem('#dcfce7','#15803d',icoTest, (kz?'Қорытынды тест':'Финальный тест'), kz?('Тест · 10 сұрақ'):('Тест · 10 вопросов'), testBody)
+        + '</div></div>';
     }
     function showVideoUrl(n){
       const url = (document.getElementById('vidurl-'+n).value || '').trim();
@@ -792,6 +818,8 @@
     function scoreFor(i, day){ return SCORE_POOL[(i * 4 + day) % SCORE_POOL.length]; }
     const TOTAL_DAYS = 8;
     let OPEN_DAYS = new Set([1,2,3,4,5,6,7,8]);
+    const FINAL = { id:9, title:'Финальный тест', titleKz:'Қорытынды тест', sub:'Все 8 дней курса — в одном тесте', subKz:'Барлық 8 күн — бір тестте', q:10, cat:'ai' };
+    let FINAL_OPEN = true;
     let SUPER_PASS_MEM = '';
     function isDayOpen(n){ return OPEN_DAYS.has(n); }
     function openCount(){ return OPEN_DAYS.size; }
@@ -800,12 +828,14 @@
         const r = await fetch('/api/days', { cache: 'no-store' });
         if (!r.ok) return;
         const d = await r.json();
+        let changed = false;
         if (Array.isArray(d.openDays)){
           const next = new Set(d.openDays);
-          const changed = next.size !== OPEN_DAYS.size || [...next].some(x => !OPEN_DAYS.has(x));
+          changed = next.size !== OPEN_DAYS.size || [...next].some(x => !OPEN_DAYS.has(x));
           OPEN_DAYS = next;
-          if (changed) refreshAll();
         }
+        if (typeof d.finalOpen === 'boolean' && d.finalOpen !== FINAL_OPEN){ FINAL_OPEN = d.finalOpen; changed = true; }
+        if (changed) refreshAll();
       } catch(e){}
     }
     async function toggleDay(n){
@@ -814,6 +844,14 @@
       try {
         await fetch('/api/days', { method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ openDays:[...OPEN_DAYS] }) });
+      } catch(e){}
+    }
+    async function toggleFinal(){
+      FINAL_OPEN = !FINAL_OPEN;
+      refreshAll();
+      try {
+        await fetch('/api/days', { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ openDays:[...OPEN_DAYS], finalOpen: FINAL_OPEN }) });
       } catch(e){}
     }
     let daysPollTimer = null;
@@ -1172,7 +1210,18 @@
           + '<span>' + d.q + '</span>'
           + '<span>' + PASS_MARK + '%</span>'
           + '<span style="font-weight:800;color:' + avgCol + '">' + avgTxt + '</span></div>';
-      }).join('');
+      }).join('') + finalTestRow();
+    }
+    function finalTestRow(){
+      const kz = LANG === 'kz';
+      const name = kz ? FINAL.titleKz : FINAL.title;
+      const bound = kz ? 'Қорытынды' : 'Финал';
+      return '<div class="tgrid trow">'
+        + '<span style="font-weight:600">' + name + '</span>'
+        + '<span class="sgrp">' + bound + '</span>'
+        + '<span>10</span>'
+        + '<span>' + PASS_MARK + '%</span>'
+        + '<span style="font-weight:800;color:#8a93ad">—</span></div>';
     }
 
     let periodFilter = '30';

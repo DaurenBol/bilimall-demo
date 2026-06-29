@@ -23,7 +23,7 @@ const DATA = process.env.DATA_DIR || '/data';
 const FILE = path.join(DATA, 'state.json');
 try { fs.mkdirSync(DATA, { recursive: true }); } catch (e) {}
 const sha = s => crypto.createHash('sha256').update(s).digest('hex');
-const readState = () => { try { return JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch (e) { return { openDays: [1,2,3,4,5,6,7,8] }; } };
+const readState = () => { try { const s = JSON.parse(fs.readFileSync(FILE, 'utf8')); if (!Array.isArray(s.openDays)) s.openDays = [1,2,3,4,5,6,7,8]; if (typeof s.finalOpen !== 'boolean') s.finalOpen = true; return s; } catch (e) { return { openDays: [1,2,3,4,5,6,7,8], finalOpen: true }; } };
 const writeState = s => fs.writeFileSync(FILE, JSON.stringify(s));
 function sign(role){ const exp = Date.now() + 1000*60*60*12; const data = role + '.' + exp; return data + '.' + crypto.createHmac('sha256', SECRET).update(data).digest('hex'); }
 function verify(tok){ if (!tok) return null; const p = String(tok).split('.'); if (p.length !== 3) return null; const data = p[0] + '.' + p[1]; const good = crypto.createHmac('sha256', SECRET).update(data).digest('hex'); if (p[2] !== good) return null; if (Date.now() > +p[1]) return null; return (p[0] === 'super' || p[0] === 'admin') ? p[0] : null; }
@@ -43,11 +43,17 @@ app.post('/api/logout', (req, res) => { res.clearCookie('ba_sess'); res.json({ o
 app.get('/api/days', auth, (req, res) => res.json(readState()));
 app.post('/api/days', auth, (req, res) => {
   if (req.role !== 'super') return res.status(403).json({ error: 'forbidden' });
-  const { openDays } = req.body || {};
-  if (!Array.isArray(openDays)) return res.status(400).json({ error: 'bad' });
-  const clean = [...new Set(openDays.filter(d => Number.isInteger(d) && d >= 1 && d <= TOTAL))].sort((a,b)=>a-b);
-  writeState({ openDays: clean });
-  res.json({ ok: true, openDays: clean });
+  const body = req.body || {};
+  const cur = readState();
+  let openDays = Array.isArray(cur.openDays) ? cur.openDays : [1,2,3,4,5,6,7,8];
+  if (Array.isArray(body.openDays)) {
+    openDays = [...new Set(body.openDays.filter(d => Number.isInteger(d) && d >= 1 && d <= TOTAL))].sort((a,b)=>a-b);
+  }
+  let finalOpen = (typeof cur.finalOpen === 'boolean') ? cur.finalOpen : true;
+  if (typeof body.finalOpen === 'boolean') finalOpen = body.finalOpen;
+  const state = { openDays, finalOpen };
+  writeState(state);
+  res.json({ ok: true, ...state });
 });
 
 const PROFILES = path.join(DATA, 'profiles.json');
@@ -95,4 +101,4 @@ app.use('/secure', auth, express.static(path.join(__dirname, 'secure')));
 app.use('/lessons', auth, express.static(path.join(__dirname, 'secure', 'lessons')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.listen(80, () => console.log('bilimall v2 up'));
+app.listen(process.env.PORT || 80, () => console.log('bilimall v2 up'));
